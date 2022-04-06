@@ -16,11 +16,11 @@ function MainMenu({ history }) {
             <Navbar>
                 <Container>
                     <Navbar.Brand href="/">
-                        <Logo src={Icone} alt='MailShrimp' />
+                        <Logo src={Icone} alt='Question-Sender' />
                     </Navbar.Brand>
                     <Nav>
-                        <Nav.Link href="/contacts">Contatos</Nav.Link>
-                        <Nav.Link href="/messages">Mensagens</Nav.Link>
+                        <Nav.Link href="/questions">Perguntas</Nav.Link>
+                        <Nav.Link href="/answers">Respostas</Nav.Link>
                         <Nav.Link href="/settings">Minha Conta</Nav.Link>
                     </Nav>
                     <Nav>

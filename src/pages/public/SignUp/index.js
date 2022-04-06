@@ -3,30 +3,30 @@ import { Container, Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import {Link, withRouter} from 'react-router-dom';
 import Logo from '../../../assets/logo.png';
 import { BoxContent, BoxForm } from '../../../shared/styles';
-//import AccountService from '../../../services/accounts';
+import CompaniesService from '../../../services/companies';
 
 class SignUp extends React.Component {
     /*O state armazena os dados do <Form> em variáveis*/ 
     state = {
         name: '',
-        email: '',
+        userName: '',
         password: '',
-        domain: '',
+        urlQrCode: '',
         error: '',
         isLoading: false,
     };
 
     handleSignUp = async(event)=>{
         event.preventDefault();
-        const {name, email, password, domain, isLoading} = this.state;
+        const {name, userName, password, urlQrCode, isLoading} = this.state;
         /* Valida se todos os campos foram informados */
-        if (!name || !email || !domain || !password){
+        if (!name || !userName || !password){
             this.setState({error: "Informe todos os campos para se cadastrar"})
         } else {
             try{
-                //const service = new AccountService();
+                const service = new CompaniesService();
                 /* Faz o post para o backend logar */
-                //await service.signup({name, email, password, domain});
+                await service.signup({name, userName, password});
                 this.props.history.push("/signin");
             }catch(error){
                 console.log(error);
@@ -36,6 +36,7 @@ class SignUp extends React.Component {
     }
 
     renderError = () =>{
+        const {error} = this.state;
         return (
             <Alert variant="danger">
                 {this.state.error}
@@ -66,21 +67,12 @@ class SignUp extends React.Component {
                                     />
                                 </Form.Group>
 
-                                <Form.Group controlId="emailGroup">
-                                    <Form.Label>E-mail:</Form.Label>
+                                <Form.Group controlId="usuarioGroup">
+                                    <Form.Label>Usuário:</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Digite seu e-mail"
-                                        onChange={e => this.setState({email: e.target.value})}
-                                    />
-                                </Form.Group>
-
-                                <Form.Group controlId="dominioGroup">
-                                    <Form.Label>Domínio:</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Digite seu domínio"
-                                        onChange={e => this.setState({domain: e.target.value})}
+                                        placeholder="Digite seu usuário"
+                                        onChange={e => this.setState({userName: e.target.value})}
                                     />
                                 </Form.Group>
 

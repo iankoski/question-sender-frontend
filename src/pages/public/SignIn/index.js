@@ -1,13 +1,12 @@
 import React from 'react';
-import { Button, Form, Container, Row, Col } from 'react-bootstrap';
+import { Button, Form, Container, Row, Col, Alert } from 'react-bootstrap';
 import Logo from '../../../assets/logo.png';
 import { BoxContent, BoxForm } from '../../../shared/styles';
 import { Link, withRouter } from 'react-router-dom';
-//import AccountsService from '../../../services/accounts';
-//import { login } from '../../../services/auth';
+import CompaniesService from '../../../services/companies';
+import { login } from '../../../services/auth';
 class SignIn extends React.Component {
-
-    sate = {
+    state = {
         userName: '',
         password: '',
         error: ''
@@ -15,23 +14,32 @@ class SignIn extends React.Component {
     handleSignIn = async (event) => {
         /*Chamada feita para evitar que o navegador faça um POST*/
         event.preventDefault();
-        const { userName, password, error } = this.state;
+        const { userName, password } = this.state;
         if (!userName || !password) {
-            this.setState({ error: "Informe todos os campos para acessar" })
+            this.setState({ error: "Informe todos os campos para acessar" });
         } else {
             try {
                 /* Faz o post para o backend logar */
-                //const service = new AccountsService();
-                //const response = await service.login(userName, password);
+                const service = new CompaniesService();
+                const response = await service.login(userName, password);
                 /* Faz o login passando o token que veio da requisição */
-                //login(response.data.token);
-                this.props.history.push("/");
-            } catch {
-                console.log(`Deu um erro ${Error}`);
+                login(response.data.token);
+                this.props.history.push("/questions");
+            } catch (error) {                
+                console.log(`Erro handleSignIn ${error}`);
                 this.setState({ error: 'Ocorreu um erro durante o login' });
             }
         }
     }
+    renderError = () => {
+        const { error } = this.state;
+    
+        return (
+          <Alert variant="danger">
+            {error}
+          </Alert>
+        )
+      }
 
     render() {
         return (
@@ -44,7 +52,8 @@ class SignIn extends React.Component {
                         <BoxForm>
                             <h2>Login</h2>
                             <p>Informe seus dados para autenticar: </p>
-                            <Form onSubmit={this.handleSignIn} >
+                            {this.state.error && this.renderError()}
+                            <Form onSubmit={this.handleSignIn} >                                
                                 <Form.Group controlId="userNameGroup">
                                     <Form.Label>Usuário:</Form.Label>
                                     <Form.Control type="userName"
