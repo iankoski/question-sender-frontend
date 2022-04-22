@@ -5,6 +5,8 @@ import { BoxContent, BoxForm } from '../../../shared/styles';
 import { Link, withRouter } from 'react-router-dom';
 import CompaniesService from '../../../services/companies';
 import { login } from '../../../services/auth';
+import Footer from '../../../shared/footer';
+import { PageContent } from '../../../shared/styles';
 class SignIn extends React.Component {
     state = {
         userName: '',
@@ -25,7 +27,7 @@ class SignIn extends React.Component {
                 /* Faz o login passando o token que veio da requisição */
                 login(response.data.token);
                 this.props.history.push("/questions");
-            } catch (error) {                
+            } catch (error) {
                 console.log(`Erro handleSignIn ${error}`);
                 this.setState({ error: 'Ocorreu um erro durante o login' });
             }
@@ -33,67 +35,75 @@ class SignIn extends React.Component {
     }
     renderError = () => {
         const { error } = this.state;
-    
+
         return (
-          <Alert variant="danger">
-            {error}
-          </Alert>
+            <Alert variant="danger">
+                {error}
+            </Alert>
         )
-      }
+    }
 
     render() {
         return (
-            <Container >
-                <Row className="justify-content-md-center" >
-                    <Col xs={12} md={6}>
-                        <BoxContent>
-                            <img src={Logo} alt='MailShrimp' />
-                        </BoxContent>
-                        <BoxForm>
-                            <h2>Login</h2>
-                            <p>Informe seus dados para autenticar: </p>
-                            {this.state.error && this.renderError()}
-                            <Form onSubmit={this.handleSignIn} >                                
-                                <Form.Group controlId="userNameGroup">
-                                    <Form.Label>Usuário:</Form.Label>
-                                    <Form.Control type="userName"
-                                        placeholder="Digite seu nome de usuário"
-                                        onChange={e => this.setState({ userName: e.target.value })} />
-                                </Form.Group>
-                                <Form.Group controlId="passwordGroup">
-                                    <Form.Label>Senha:</Form.Label>
-                                    <Form.Control type="password"
-                                        placeholder="Digite sua senha"
-                                        onChange={e => this.setState({ password: e.target.value })} />
-                                </Form.Group>
+            <>
+                <PageContent>
 
-                                <div className="d-grid gap-2">
-                                    <br />
-                                    <style type="text/css">
-                                        {`
+                    <Container >
+                        <Row className="justify-content-md-center" >
+                            <Col xs={12} md={6}>
+                                <BoxContent>
+                                    <img src={Logo} alt='MailShrimp' />
+                                </BoxContent>
+                                <BoxForm>
+                                    <h2>Login</h2>
+                                    <p>Informe seus dados para autenticar: </p>
+                                    {this.state.error && this.renderError()}
+                                    <Form onSubmit={this.handleSignIn} >
+                                        <Form.Group controlId="userNameGroup">
+                                            <Form.Label>Usuário:</Form.Label>
+                                            <Form.Control type="userName"
+                                                placeholder="Digite seu nome de usuário"
+                                                onChange={e => this.setState({ userName: e.target.value })} />
+                                        </Form.Group>
+                                        <Form.Group controlId="passwordGroup">
+                                            <Form.Label>Senha:</Form.Label>
+                                            <Form.Control type="password"
+                                                placeholder="Digite sua senha"
+                                                onChange={e => this.setState({ password: e.target.value })} />
+                                        </Form.Group>
+
+                                        <div className="d-grid gap-2">
+                                            <br />
+                                            <style type="text/css">
+                                                {`
                                         .btn-login {
                                         background-color: SteelBlue;
                                         color: white;
                                         }
                                         `}
-                                    </style>
+                                            </style>
 
-                                    <Button variant="login" type="submit">
-                                        Fazer Login
-                                    </Button>
-                                </div>
+                                            <Button variant="login" type="submit">
+                                                Fazer Login
+                                            </Button>
+                                        </div>
 
-                            </Form>
-                        </BoxForm>
+                                    </Form>
+                                </BoxForm>
 
-                        <BoxContent>
-                            <p>Novo na plataforma?</p>
-                            <Link className="button" to="/signup">Crie sua conta</Link>
-                        </BoxContent>
-                    </Col>
-                </Row>
+                                <BoxContent>
+                                    <p>Novo na plataforma?</p>
+                                    <Link className="button" to="/signup">Crie sua conta</Link>
+                                </BoxContent>
+                            </Col>
 
-            </Container>
+                        </Row>
+
+
+                    </Container>
+                    <Footer text="O Perguntador é uma plataforma para coleta de opinião de público através de perguntas com múltiplas escolhas. Experimente!" />
+                </PageContent>
+            </>
         )
     }
 }

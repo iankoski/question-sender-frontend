@@ -1,10 +1,11 @@
 import React from 'react';
 import Header from '../../../shared/header';
-import { PageContent } from '../../../shared/styles';
+import Footer from '../../../shared/footer';
+import { PageContent, BoxForm } from '../../../shared/styles';
 import { Container, Table, Row, Col, Button } from 'react-bootstrap';
 import { Link, withRouter, useRouteMatch } from 'react-router-dom';
 import QuestionsService from '../../../services/questions';
-import {dateFormat} from '../../../services/util';
+import { dateFormat } from '../../../services/util';
 function RenderLine({ question }) {
     const { url } = useRouteMatch();
     return (
@@ -15,7 +16,7 @@ function RenderLine({ question }) {
             <td>
                 {dateFormat(question.startDate, 'dd/MM/yyyy')}
             </td>
-            <td>                
+            <td>
                 {dateFormat(question.endDate, 'dd/MM/yyyy')}
             </td>
         </tr>
@@ -24,6 +25,7 @@ function RenderLine({ question }) {
 
 function RenderTable({ questions }) {
     return (
+
         <Table striped bordered hover >
             <thead>
                 <tr>
@@ -34,7 +36,7 @@ function RenderTable({ questions }) {
             </thead>
             <tbody>
                 {questions.length === 0 && <RenderEmptyRow mensagem="Nenhuma pergunta foi adicionada" />}
-                {questions.map((item) => <RenderLine key={item.id} question={item} />)}                
+                {questions.map((item) => <RenderLine key={item.id} question={item} />)}
             </tbody>
         </Table>
     )
@@ -74,18 +76,24 @@ class Questions extends React.Component {
                 <Header />
                 <PageContent>
                     <Container>
-                        <Row>
-                            <Col>
-                                <h3>Perguntas</h3>
-                            </Col>
-                            <Col>
-                                <Link className='btn btn-success float-end' to='/questions/add'>Adicionar pergunta</Link>
-                            </Col>
-                        </Row>
-                        <p>Relação de perguntas cadastradas.</p>
-                        {!isLoading && <RenderTable questions={questions} />}
+                        <BoxForm>
+                            <Row>
+
+                                <Col>
+                                    <h3>Perguntas</h3>
+                                </Col>
+                                <Col>
+                                    <Link className='btn btn-success float-end' to='/questions/add'>Adicionar pergunta</Link>
+                                </Col>
+
+                            </Row>
+                            <p>Relação de perguntas cadastradas.</p>
+                            {!isLoading && <RenderTable questions={questions} />}
+                        </BoxForm>
                     </Container>
+                    
                 </PageContent>
+                <Footer text="Listagem de todas as perguntas cadastradas. Clique em uma pergunta para ver as alternativas e mais opções."/>
             </>
         )
 

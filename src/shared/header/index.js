@@ -15,7 +15,7 @@ function MainMenu({ history }) {
         <Header>
             <Navbar>
                 <Container>
-                    <Navbar.Brand href="/">
+                    <Navbar.Brand href="/" >
                         <Logo src={Icone} alt='Question-Sender' />
                     </Navbar.Brand>
                     <Nav>
