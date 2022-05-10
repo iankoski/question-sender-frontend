@@ -7,6 +7,9 @@ import CompaniesService from '../../../services/companies';
 import { login } from '../../../services/auth';
 import Footer from '../../../shared/footer';
 import { PageContent } from '../../../shared/styles';
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
 class SignIn extends React.Component {
     state = {
         userName: '',
@@ -42,6 +45,13 @@ class SignIn extends React.Component {
             </Alert>
         )
     }
+    async componentDidMount() {
+        const { params: { errorAuth } } = this.props.match;
+        console.log('errorAuth '+errorAuth);
+        if (errorAuth){
+            this.setState({ error: errorAuth });
+        }
+    }    
 
     render() {
         return (
@@ -52,7 +62,7 @@ class SignIn extends React.Component {
                         <Row className="justify-content-md-center" >
                             <Col xs={12} md={6}>
                                 <BoxContent>
-                                    <img src={Logo} alt='MailShrimp' />
+                                    <img src={Logo} alt='QuestionSender' />
                                 </BoxContent>
                                 <BoxForm>
                                     <h2>Login</h2>

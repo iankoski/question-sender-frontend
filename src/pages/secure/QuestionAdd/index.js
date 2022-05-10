@@ -3,10 +3,10 @@ import Header from '../../../shared/header';
 import Footer from '../../../shared/footer';
 import { PageContent, BoxForm, AlternativeLetter } from '../../../shared/styles';
 import { Container, Button, Form, Alert, Row, Col, Modal } from 'react-bootstrap';
+import { validateQuestionAndAlternatives } from '../../../services/util';
 import QuestionsService from '../../../services/questions';
 import AlternativesService from '../../../services/alternatives';
-import { withRouter, Link } from 'react-router-dom';
-
+import { withRouter, Link, useHistory } from 'react-router-dom';
 
 class QuestionAdd extends React.Component {
     constructor(props) {
@@ -22,33 +22,35 @@ class QuestionAdd extends React.Component {
         }
     }
 
+    handleAddedQuestionModal() {
+        this.setState({ showAddedQuestionModal: true });        
+        console.log(`handleAddedQuestionModal ${this.state.showAddedQuestionModal}`);
+    }
+
     handleSave = async (event) => {
-        event.preventDefault();
-        const { description, startDate, endDate, alternatives } = this.state;
+        try {
+            event.preventDefault();
+            const { description, alternatives } = this.state;
+            const startDate = new Date(this.state.startDate);
+            const endDate = new Date(this.state.endDate);
+            validateQuestionAndAlternatives(description, startDate, endDate, alternatives, 'add');
+            const questionService = new QuestionsService();
+            const alternativeService = new AlternativesService();
+            /* Primeiro salva a pergunta */
+            const questionResult = await questionService.add({ description, startDate, endDate });
+            /* Atribui o id da pergunta a alternativa */
+            const alternativeResult = await alternativeService.add(alternatives, questionResult.id);
+            this.setState({ showAddedQuestionModal: true });
+        } catch (error) {
+            console.log('handleSave ' + error);
+            this.setState({ showAddedQuestionModal: false });
+            this.setState({ error });
+        }
 
-
-
-        if (!description || !startDate || !endDate || !alternatives) {
-            this.setState({ error: "Informe todos os campos para adicionar a pergunta" });
-        } else {
-            try {
-                const questionService = new QuestionsService();
-                const alternativeService = new AlternativesService();
-                /* Primeiro salva a pergunta */
-                const questionResult = await questionService.add({ description, startDate, endDate });
-                /* Atribui o id da pergunta a alternativa */
-                const alternativeResult = await alternativeService.add(alternatives, questionResult.id);
-                this.setState({ showAddedQuestionModal: true });
-            } catch (error) {
-                this.setState({ error: "Ocorreu um erro durante a criação da pergunta"+error });
-            }
-        };
     }
 
     handleSetAlternative = (e, index) => {
-
         var array = [...this.state.alternatives];
-        console.log('antes handleSetAlternative: ' + e + ' index: ' + index);
         array[index] = e;
         this.setState({ alternatives: array });
     }
@@ -57,10 +59,9 @@ class QuestionAdd extends React.Component {
 
         if (this.state.alternatives.length > 4) {
             this.setState({ error: "A quantidade máxima de alternativas é 5" });
-            //console.log('handleIncrementAlternatives: ' + this.state.alternatives.length);
             return;
         }
-        //console.log('handleIncrementAlternatives: ' + e);
+
         this.setState(prevState => ({
             //count: this.state.count + 1
             alternatives: [...prevState.alternatives, this.state.alternatives.length + 1]
@@ -73,10 +74,9 @@ class QuestionAdd extends React.Component {
             this.setState({ error: "A quantidade mínima de alternativas é 2" });
             return;
         }
-        console.log('handleDecressAlternatives: ' + array.length);
+
         array.splice(array.length - 1, 1);
         this.setState({ alternatives: array });
-
     }
 
     handleRedirectModal = async (event) => {
@@ -92,12 +92,13 @@ class QuestionAdd extends React.Component {
             </Alert>
         )
     }
-
+    
     render() {
         return (
             <>
                 <Header />
                 <PageContent>
+                    
                     <Container>
                         <Col lg={8} sm={12}>
                             <BoxForm>
@@ -150,9 +151,8 @@ class QuestionAdd extends React.Component {
 
                                         <h4>Alternativas</h4>
                                         {this.state.alternatives.map((alternative, index) => (
-
                                             <Form.Group as={Row} className="mb-3">
-                                                <Form.Label column sm="2">{`${String.fromCharCode(65 + index)}`}</Form.Label>
+                                                <AlternativeLetter>{`${String.fromCharCode(65 + index)}`}</AlternativeLetter>
                                                 <Col>
                                                     <Form.Control
                                                         as="textarea"
@@ -168,7 +168,8 @@ class QuestionAdd extends React.Component {
 
                                         <Row>
                                             <Col>
-                                                <Button className='btn btn-success' variant="primary" type="submit" >Adicionar Pergunta</Button>
+                                                <Button className='btn btn-success' variant="primary" type="submit" 
+                                                    onClick={() => { this.handleAddedQuestionModal() }} >Adicionar Pergunta</Button>
                                             </Col>
                                             <Col xs lg="2">
                                                 <Button className='btn' variant="outline-primary" type="button"

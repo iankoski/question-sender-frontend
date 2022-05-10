@@ -1,9 +1,11 @@
 import React from 'react';
 import Header from '../../../shared/header';
 import Footer from '../../../shared/footer';
-import { PageContent, BoxForm } from '../../../shared/styles';
+import { PageContent, BoxForm, AlternativeLetter } from '../../../shared/styles';
 import QuestionsService from '../../../services/questions';
-import { dateFormat } from '../../../services/util';
+import AlternativesService from '../../../services/alternatives';
+import AnswersService from '../../../services/answers';
+import { dateFormat, validateQuestionAndAlternatives } from '../../../services/util';
 import { Link, withRouter, useRouteMatch } from 'react-router-dom';
 import { Container, Button, Form, Alert, Row, Col, Modal } from 'react-bootstrap';
 class QuestionDetails extends React.Component {
@@ -17,7 +19,9 @@ class QuestionDetails extends React.Component {
                 endDate: ''
             },
             showDeleteModal: false,
-            showDeletedQuestionModal: false
+            showDeletedQuestionModal: false,
+            showAlteredQuestionModal: false,
+            alternatives: []
         }
     }
 
@@ -34,32 +38,74 @@ class QuestionDetails extends React.Component {
             startDate: this.state.question.startDate,
             endDate: this.state.question.endDate,
         })
-        console.log(`log 1 question State: ${this.state.question.description} description state  2 ${this.state.description}`);
+
+    }
+
+    async getAlternatives(questionId) {
+        const service = new AlternativesService();
+        try {
+            const result = await service.getAll(questionId);
+            this.setState({
+                isLoading: false,
+                alternatives: result
+            });
+        } catch (error) {
+            console.log('getAlternatives ' + error);
+            if (error.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     }
 
     handleSave = async (event) => {
-        event.preventDefault();
-        console.log(`log 2 question State: ${this.state.question.description} description state 2 ${this.state.description}`);
-        const { description, startDate, endDate } = this.state;
-        const { params: { questionId } } = this.props.match;
-        if (!description || !startDate || !endDate) {
-            this.setState({ error: "Informe todos os campos para adicionar a pergunta" });
-        } else {
-            try {
-                const service = new QuestionsService();
-                await service.set({ description, startDate, endDate }, questionId);
-                /* Retorna o usuário para a tela anterior */
-                this.props.history.push('/questions');
-            } catch (error) {
-                this.setState({ error: "Ocorreu um erro durante a criação da pergunta" });
-            }
-        };
+        try {
+            event.preventDefault();
+
+            const { description, alternatives } = this.state;
+            const startDate = new Date(this.state.startDate);
+            const endDate = new Date(this.state.endDate);
+            const { params: { questionId } } = this.props.match;
+
+            validateQuestionAndAlternatives(description, startDate, endDate, alternatives, 'alter');
+
+            const questionService = new QuestionsService();
+            const alternativeService = new AlternativesService();
+            const answerService = new AnswersService();
+
+            const questionAnswers = await answerService.getQuestionAnswers(questionId);
+
+            if (questionAnswers > 0){
+                throw 'Esta pergunta já foi respondida e não pode ser alterada';
+            };
+
+            await questionService.set({ description, startDate, endDate }, questionId);
+
+            alternatives.map((a) => { a.questionId = questionId });
+
+            await alternativeService.set(alternatives, questionId);
+            /* Retorna o usuário para a tela anterior */
+            this.setState({showAlteredQuestionModal: true});
+
+        } catch (error) {
+            console.log('handleSave: ' + error);
+            this.setState({showAlteredQuestionModal: false});
+            this.setState({ error });
+        }
+
     }
 
     /*Ciclo de vida do React: essa função será executada sempre que o componente é montado*/
     async componentDidMount() {
-        const { params: { questionId } } = this.props.match;
-        await this.getQuestion(questionId);
+        try { 
+            const { params: { questionId } } = this.props.match;
+            await this.getQuestion(questionId);
+            await this.getAlternatives(questionId);
+        } catch (error) {
+            if (error.response.status === 401) {
+                let errorAuth = 'Sua sessão expirou, faça o login novamente';
+                this.props.history.push(`/errorAuth/${errorAuth}`);
+            }
+        }
     }
 
     renderError = () => {
@@ -73,6 +119,16 @@ class QuestionDetails extends React.Component {
         console.log(`handleDeleteModal ${this.state.showDeleteModal}`);
     }
 
+    handleSetAlternative = (element, index) => {
+        var array = this.state.alternatives;
+        array.map((e, i) => {
+            if (i === index) {
+                e.description = element;
+            }
+        });
+        this.setState({ alternatives: array });
+    }
+
     handleRedirectModal = async (event) => {
         /* Redireciona para a página anterior */
         this.props.history.push('/questions');
@@ -84,9 +140,7 @@ class QuestionDetails extends React.Component {
     }
     handleDeleteQuestion = async (event) => {
         event.preventDefault();
-        console.log(`handleDeleteQuestion : ${this.state.question.description} description state 2 ${this.state.description}`);
         const { params: { questionId } } = this.props.match;
-
         try {
             const service = new QuestionsService();
             await service.delete(questionId);
@@ -96,7 +150,26 @@ class QuestionDetails extends React.Component {
         } catch (error) {
             this.setState({ error: "Ocorreu um erro durante a exclusão da pergunta" });
         };
+    }
+    handleIncrementAlternatives = () => {
 
+        if (this.state.alternatives.length > 4) {
+            this.setState({ error: "A quantidade máxima de alternativas é 5" });
+            return;
+        }
+        var array = this.state.alternatives;
+        array.push({ description: '' });
+
+        this.setState({ alternatives: array });
+    }
+    handleDecressAlternatives = () => {
+        var array = [...this.state.alternatives];
+        if (array.length < 3) {
+            this.setState({ error: "A quantidade mínima de alternativas é 2" });
+            return;
+        }
+        array.splice(array.length - 1, 1);
+        this.setState({ alternatives: array });
     }
 
     render() {
@@ -111,54 +184,87 @@ class QuestionDetails extends React.Component {
                 <PageContent>
 
                     <Container>
-                        <Row>
-                            <Col>
-                                <h3>Dados da Pergunta</h3>
-                            </Col>
-                        </Row>
-                        <Col lg={6} sm={12}>
+                        <Col lg={8} sm={12}>
                             <BoxForm>
+                                <Row>
+                                    <Col>
+                                        <h3>Dados Pergunta</h3>
+                                    </Col>
+                                </Row>
                                 {this.state.error && this.renderError()}
                                 <Form onSubmit={this.handleSave}>
-                                    <Form.Group>
-                                        <Form.Label>Descrição: </Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            as="textarea"
-                                            rows={3}
-                                            defaultValue={isLoading ? (null) : (this.state.question.description)}
-                                            placeholder="Digite a pergunta"
-                                            onChange={e => this.setState({ description: e.target.value })}>
-                                        </Form.Control>
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="2">Descrição: </Form.Label>
+                                        <Col >
+                                            <Form.Control
+                                                as="textarea"
+                                                rows={3}
+                                                type="text"
+                                                defaultValue={isLoading ? (null) : this.state.question.description}
+                                                placeholder="Digite a descrição da pergunta"
+                                                onChange={e => this.setState({ description: e.target.value })}>
+                                            </Form.Control>
+                                        </Col>
                                     </Form.Group>
 
-                                    <Form.Group controlId="startDate">
-                                        <Form.Label>Data Início: </Form.Label>
-                                        <Form.Control
-                                            type="date"
-                                            defaultValue={isLoading ? (null) : (dateFormat(this.state.question.startDate, 'yyyy-MM-dd'))}
-                                            placeholder="Data Início"
-                                            name="startDate"
-                                            onChange={e => this.setState({ startDate: new Date(e.target.value) })}>
-                                        </Form.Control>
+                                    <Form.Group controlId="startDate" as={Row} className="mb-3">
+                                        <Form.Label column sm="2">Data Início: </Form.Label>
+                                        <Col lg={4}>
+                                            <Form.Control
+                                                type="date"
+                                                defaultValue={isLoading ? (null) : (dateFormat(this.state.question.startDate, 'yyyy-MM-dd'))}
+                                                placeholder="Data Início"
+                                                name="startDate"
+                                                onChange={e => this.setState({ startDate: new Date(e.target.value) })}>
+                                            </Form.Control>
+                                        </Col>
                                     </Form.Group>
 
-                                    <Form.Group controlId="endDate">
-                                        <Form.Label>Data Fim: </Form.Label>
-                                        <Form.Control
-                                            type="date"
-                                            defaultValue={isLoading ? (null) : (dateFormat(this.state.question.endDate, 'yyyy-MM-dd'))}
-                                            placeholder="Data Fim"
-                                            name="startDate"
-                                            onChange={e => this.setState({ endDate: e.target.value })}>
-                                        </Form.Control>
+                                    <Form.Group controlId="endDate" as={Row} className="mb-3">
+                                        <Form.Label column sm="2">Data Fim: </Form.Label>
+                                        <Col lg={4}>
+                                            <Form.Control
+                                                type="date"
+                                                defaultValue={isLoading ? (null) : (dateFormat(this.state.question.endDate, 'yyyy-MM-dd'))}
+                                                placeholder="Data Fim"
+                                                name="startDate"
+                                                onChange={e => this.setState({ endDate: e.target.value })}>
+                                            </Form.Control>
+                                        </Col>
                                     </Form.Group>
-                                    <br />
+
+                                    <h4>Alternativas</h4>
+                                    {isLoading ? (null) :
+                                        this.state.alternatives.map((alternative, index) =>
+                                            <Form.Group as={Row} className="mb-3">
+                                                <AlternativeLetter>{`${String.fromCharCode(65 + index)}`}</AlternativeLetter>
+                                                <Col>
+                                                    <Form.Control
+                                                        as="textarea"
+                                                        rows={3}
+                                                        type="text"
+                                                        name={alternative}
+                                                        defaultValue={isLoading ? (null) : (alternative.description)}
+                                                        onChange={e => { this.handleSetAlternative(e.target.value, index) }}
+                                                        placeholder="Alternativa">
+                                                    </Form.Control>
+                                                </Col>
+                                            </Form.Group>
+                                        )}
+
                                     <Row>
-                                        <Col xs={5}>
+                                        <Col lg={3} sm={2}>
                                             <Button variant="primary" type="submit" >Alterar Pergunta</Button>
                                         </Col>
-                                        <Col xs={5}>
+                                        <Col lg={2}>
+                                            <Button className='btn' variant="outline-primary" type="button"
+                                                onClick={e => { this.handleIncrementAlternatives() }}>+ Alternativa</Button>
+                                        </Col>
+                                        <Col lg={2} sm={2}>
+                                            <Button className='btn' variant="outline-warning" type="button"
+                                                onClick={e => { this.handleDecressAlternatives() }}>- Alternativa</Button>
+                                        </Col>
+                                        <Col lg={3} sm={2}>
                                             <Button variant="danger" type="button" onClick={() => { this.handleDeleteModal() }}>Excluir Pergunta</Button>
                                         </Col>
 
@@ -193,12 +299,21 @@ class QuestionDetails extends React.Component {
                                         </Modal.Footer>
                                     </Modal>
 
+                                    <Modal show={this.state.showAlteredQuestionModal}>
+                                        <Modal.Header>
+                                            <Modal.Title>Pergunta alterada com sucesso</Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Footer>
+                                            <Button variant="success" type="button" onClick={() => { this.handleRedirectModal() }}>OK</Button>
+                                        </Modal.Footer>
+                                    </Modal>                                    
+
                                 </Form>
                             </BoxForm>
-                        </Col>                        
-                    </Container>                
+                        </Col>
+                    </Container>
                 </PageContent>
-                <Footer text="Uma pergunta somente pode ser alterada se ainda não tiver respostas"/>
+                <Footer text="Uma pergunta somente pode ser alterada se ainda não tiver respostas" />
             </>
         )
     }

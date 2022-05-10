@@ -14,13 +14,14 @@ class QuestionsService {
 
     async getOne(questionId) {
         const result = await this.api.get(`questions/${questionId}`);
-        console.log(result);
         return result.data;
     }
 
     async add(questionModel) {
         try {
+            console.log('antes do add ');
             const result = await this.api.post('questions', questionModel);
+            console.log('após do add ');
             return result.data;
         } catch (error) {
             console.log(`addQuestion error: ${error}`);

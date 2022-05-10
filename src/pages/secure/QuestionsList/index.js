@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../../../shared/header';
 import Footer from '../../../shared/footer';
 import { PageContent, BoxForm } from '../../../shared/styles';
@@ -56,25 +56,33 @@ class Questions extends React.Component {
         this.state = {
             isLoading: true,
             questions: [],
+            text: ''
         }
     }
 
     async componentDidMount() {
         const service = new QuestionsService();
-        const result = await service.getAll();
-        this.setState({
-            isLoading: false,
-            questions: result,
-        });
+        try {
+            const result = await service.getAll();
+            this.setState({
+                isLoading: false,
+                questions: result,
+            });
+        } catch (error) {
+            console.log('getAlternatives '+error);
+            if (error.response.status === 401){
+                let errorAuth = 'Sua sessão expirou, faça o login novamente';
+                this.props.history.push(`/errorAuth/${errorAuth}`);                
+            }
+        }
     }
 
     render() {
         const { isLoading, questions } = this.state;
-
         return (
             <>
                 <Header />
-                <PageContent>
+                <PageContent>                    
                     <Container>
                         <BoxForm>
                             <Row>
@@ -91,9 +99,9 @@ class Questions extends React.Component {
                             {!isLoading && <RenderTable questions={questions} />}
                         </BoxForm>
                     </Container>
-                    
+
                 </PageContent>
-                <Footer text="Listagem de todas as perguntas cadastradas. Clique em uma pergunta para ver as alternativas e mais opções."/>
+                <Footer text="Listagem de todas as perguntas cadastradas. Clique em uma pergunta para ver as alternativas e mais opções." />
             </>
         )
 

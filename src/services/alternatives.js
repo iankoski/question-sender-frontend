@@ -6,9 +6,9 @@ class AlternativesService {
         /* Endereço da API de perguntas */
         this.api = baseAPI(baseURLs.API_ALTERNATIVES);
     }
-    /* Como o result retorna vários dados do response, aqui usaremos apenas os dados do contato mesmo */
-    async getAll() {
-        const result = await this.api.get('/alternatives/company');
+    /* getAll retorna apenas alternativas de uma pergunta */
+    async getAll(questionId) {
+        const result = await this.api.get(`/alternatives/company/${questionId}`);
         return result.data;
     }
 
@@ -20,7 +20,7 @@ class AlternativesService {
 
     async add(alternativeDescription, questionId) {
         try {
-            console.log('questionId: ' + questionId);
+            
             var alternativesList = [];
             alternativeDescription.map(item => {
                 let alternative = {description: item, questionId: questionId};
@@ -34,9 +34,9 @@ class AlternativesService {
         }
     }
 
-    async set(alternativeModel, alternativeId) {
+    async set(alternativeModel, questionId) {
         try {
-            const result = await this.api.patch(`alternatives/${alternativeId}`, alternativeModel);
+            const result = await this.api.patch(`alternatives/${questionId}`, alternativeModel);
             return result;
         } catch (error) {
             console.log(`setAlternative error: ${error}`);

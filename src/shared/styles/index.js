@@ -13,9 +13,10 @@ export const BoxForm = styled.div`
     border-left: solid 3px #F4A460;`;
 
 export const AlternativeLetter = styled.div`
-    background-color: white;
-    text-align: center;`;
+margin-left: 1%;
+width: 3%;
+height: 3%;`;
 
 export const PageContent = styled.div`
     padding: 30px 0;
-`    
+`;

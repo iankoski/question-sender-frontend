@@ -15,23 +15,17 @@ import RoutePrivate from './route-wrapper';
 export default function Routes() {
     return (
         <Router>
-            <Switch>               
+            <Switch>
+                <Route exact path="/errorAuth/:errorAuth" component={SignInPage} />
                 <Route exact path="/" component={SignInPage} />
+                <RoutePrivate exact path="/questions/teste/:teste" component={QuestionsListPage} />
                 <RoutePrivate exact path="/questions" component={QuestionsListPage} />
+
                 <RoutePrivate exact path="/questions/add" component={QuestionsAddPage} />
-                <RoutePrivate exact path="/questions/:questionId" component={QuestionsDetailPage} />         
+                <RoutePrivate exact path="/questions/:questionId" component={QuestionsDetailPage} />
                 <Route exact path="/signin" component={SignInPage} />
                 <Route exact path="/signup" component={SignUpPage} />
             </Switch>
         </Router>
     )
-}
-
-function QuestionsRoutes(){
-    const {path} = useRouteMatch();
-    return (
-        <Switch>
-            <Route exact path ={path} component={QuestionsListPage}/>
-        </Switch>
-    );
 }
