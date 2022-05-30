@@ -7,7 +7,7 @@ import AlternativesService from '../../../services/alternatives';
 import AnswersService from '../../../services/answers';
 import { dateFormat, validateQuestionAndAlternatives } from '../../../services/util';
 import { Link, withRouter, useRouteMatch } from 'react-router-dom';
-import { Container, Button, Form, Alert, Row, Col, Modal } from 'react-bootstrap';
+import { Container, Button, Form, Alert, Row, Col, Modal, Table } from 'react-bootstrap';
 class QuestionDetails extends React.Component {
     constructor(props) {
         super(props);
@@ -43,8 +43,12 @@ class QuestionDetails extends React.Component {
 
     async getAlternatives(questionId) {
         const service = new AlternativesService();
+        const answersService = new AnswersService();
         try {
-            const result = await service.getAll(questionId);
+            var result = await service.getAll(questionId);
+            for (const [idx, r] of result.entries()) {
+                r['answersCount'] = await answersService.getCountAlternativeAnswers(r.id);
+            }
             this.setState({
                 isLoading: false,
                 alternatives: result
@@ -72,9 +76,9 @@ class QuestionDetails extends React.Component {
             const alternativeService = new AlternativesService();
             const answerService = new AnswersService();
 
-            const questionAnswers = await answerService.getQuestionAnswers(questionId);
+            const questionAnswers = await answerService.getCountQuestionAnswers(questionId);
 
-            if (questionAnswers > 0){
+            if (questionAnswers > 0) {
                 throw 'Esta pergunta já foi respondida e não pode ser alterada';
             };
 
@@ -84,11 +88,11 @@ class QuestionDetails extends React.Component {
 
             await alternativeService.set(alternatives, questionId);
             /* Retorna o usuário para a tela anterior */
-            this.setState({showAlteredQuestionModal: true});
+            this.setState({ showAlteredQuestionModal: true });
 
         } catch (error) {
             console.log('handleSave: ' + error);
-            this.setState({showAlteredQuestionModal: false});
+            this.setState({ showAlteredQuestionModal: false });
             this.setState({ error });
         }
 
@@ -96,12 +100,12 @@ class QuestionDetails extends React.Component {
 
     /*Ciclo de vida do React: essa função será executada sempre que o componente é montado*/
     async componentDidMount() {
-        try { 
+        try {
             const { params: { questionId } } = this.props.match;
             await this.getQuestion(questionId);
             await this.getAlternatives(questionId);
         } catch (error) {
-            if (error.response.status === 401) {
+            if (error.response && error.response.status === 401) {
                 let errorAuth = 'Sua sessão expirou, faça o login novamente';
                 this.props.history.push(`/errorAuth/${errorAuth}`);
             }
@@ -188,7 +192,7 @@ class QuestionDetails extends React.Component {
                             <BoxForm>
                                 <Row>
                                     <Col>
-                                        <h3>Dados Pergunta</h3>
+                                        <h3>Dados da Pergunta</h3>
                                     </Col>
                                 </Row>
                                 {this.state.error && this.renderError()}
@@ -233,25 +237,38 @@ class QuestionDetails extends React.Component {
                                         </Col>
                                     </Form.Group>
 
-                                    <h4>Alternativas</h4>
-                                    {isLoading ? (null) :
-                                        this.state.alternatives.map((alternative, index) =>
-                                            <Form.Group as={Row} className="mb-3">
-                                                <AlternativeLetter>{`${String.fromCharCode(65 + index)}`}</AlternativeLetter>
-                                                <Col>
-                                                    <Form.Control
-                                                        as="textarea"
-                                                        rows={3}
-                                                        type="text"
-                                                        name={alternative}
-                                                        defaultValue={isLoading ? (null) : (alternative.description)}
-                                                        onChange={e => { this.handleSetAlternative(e.target.value, index) }}
-                                                        placeholder="Alternativa">
-                                                    </Form.Control>
-                                                </Col>
-                                            </Form.Group>
-                                        )}
-
+                                    <Row>
+                                        <Col>
+                                            <h4>Alternativas</h4>
+                                        </Col>
+                                        <Col>
+                                            <h4 className="float-end">Qt. Respostas</h4>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        {isLoading ? (null) :
+                                            this.state.alternatives.map((alternative, index) =>
+                                                <Form.Group as={Row} className="mb-3">
+                                                    <Col md="auto">
+                                                        <AlternativeLetter>{`${String.fromCharCode(65 + index)}`}</AlternativeLetter>
+                                                    </Col>
+                                                    <Col xs={10}>
+                                                        <Form.Control
+                                                            as="textarea"
+                                                            rows={3}
+                                                            type="text"
+                                                            name={alternative}
+                                                            defaultValue={isLoading ? (null) : (alternative.description)}
+                                                            onChange={e => { this.handleSetAlternative(e.target.value, index) }}
+                                                            placeholder="Alternativa">
+                                                        </Form.Control>
+                                                    </Col>
+                                                    <Col>
+                                                        <h4 className="float-end">{alternative.answersCount}</h4>
+                                                    </Col>
+                                                </Form.Group>
+                                            )}
+                                    </Row>
                                     <Row>
                                         <Col lg={3} sm={2}>
                                             <Button variant="primary" type="submit" >Alterar Pergunta</Button>
@@ -269,9 +286,12 @@ class QuestionDetails extends React.Component {
                                         </Col>
 
                                         <Col>
-                                            <Link className="btn btn-link" to="/questions">Voltar</Link>
+                                            <Link className="btn btn-link " to="/questions">Voltar</Link>
                                         </Col>
                                     </Row>
+
+
+
 
                                     <Modal show={this.state.showDeleteModal}>
                                         <Modal.Dialog >
@@ -306,7 +326,7 @@ class QuestionDetails extends React.Component {
                                         <Modal.Footer>
                                             <Button variant="success" type="button" onClick={() => { this.handleRedirectModal() }}>OK</Button>
                                         </Modal.Footer>
-                                    </Modal>                                    
+                                    </Modal>
 
                                 </Form>
                             </BoxForm>

@@ -5,10 +5,15 @@ import { PageContent, BoxForm } from '../../../shared/styles';
 import { Container, Table, Row, Col, Button } from 'react-bootstrap';
 import { Link, withRouter, useRouteMatch } from 'react-router-dom';
 import QuestionsService from '../../../services/questions';
+import AnswersService from '../../../services/answers';
+import AlternativesService from '../../../services/alternatives';
 import { dateFormat } from '../../../services/util';
+
 function RenderLine({ question }) {
     const { url } = useRouteMatch();
+   
     return (
+
         <tr key={question.id}>
             <td>
                 <Link to={`${url}/${question.id}`}>{question.description}</Link>
@@ -19,6 +24,9 @@ function RenderLine({ question }) {
             <td>
                 {dateFormat(question.endDate, 'dd/MM/yyyy')}
             </td>
+            <td>
+                {question.alternativeDescription}
+            </td>            
         </tr>
     )
 }
@@ -26,12 +34,13 @@ function RenderLine({ question }) {
 function RenderTable({ questions }) {
     return (
 
-        <Table striped bordered hover >
+        <Table responsive striped bordered hover size="sm">
             <thead>
                 <tr>
                     <th>Descrição</th>
                     <th>Data Início</th>
                     <th>Data Fim</th>
+                    <th>Alternativa mais respondida</th>
                 </tr>
             </thead>
             <tbody>
@@ -61,18 +70,29 @@ class Questions extends React.Component {
     }
 
     async componentDidMount() {
-        const service = new QuestionsService();
+        const questionsService = new QuestionsService();
+        const answersService = new AnswersService();
+        const alternativesService = new AlternativesService();
         try {
-            const result = await service.getAll();
+            const result = await questionsService.getAll();
+
+            for (const [idx, q] of result.entries()) {
+                const mostAnswered = await answersService.getMostAnsweredAlternative(q.id);
+                q['mostAnsweredId'] = mostAnswered;
+                q['alternativeDescription'] = 'SEM RESPOSTAS';
+                if (mostAnswered){
+                    const description = await alternativesService.getOne(mostAnswered);
+                    q['alternativeDescription'] = description.description;
+                }
+            }
             this.setState({
                 isLoading: false,
                 questions: result,
-            });
-        } catch (error) {
-            console.log('getAlternatives '+error);
-            if (error.response.status === 401){
+            });            
+        } catch (error) {            
+            if (error.response && error.response.status === 401) {
                 let errorAuth = 'Sua sessão expirou, faça o login novamente';
-                this.props.history.push(`/errorAuth/${errorAuth}`);                
+                this.props.history.push(`/errorAuth/${errorAuth}`);
             }
         }
     }
@@ -82,7 +102,7 @@ class Questions extends React.Component {
         return (
             <>
                 <Header />
-                <PageContent>                    
+                <PageContent>
                     <Container>
                         <BoxForm>
                             <Row>

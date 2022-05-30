@@ -10,6 +10,8 @@ import SignUpPage from './../pages/public/SignUp';
 import QuestionsListPage from './../pages/secure/QuestionsList';
 import QuestionsAddPage from './../pages/secure/QuestionAdd';
 import QuestionsDetailPage from './../pages/secure/QuestionsDetail';
+import CompanyDetailPage from './../pages/secure/CompanyDetail';
+
 import RoutePrivate from './route-wrapper';
 
 export default function Routes() {
@@ -20,7 +22,7 @@ export default function Routes() {
                 <Route exact path="/" component={SignInPage} />
                 <RoutePrivate exact path="/questions/teste/:teste" component={QuestionsListPage} />
                 <RoutePrivate exact path="/questions" component={QuestionsListPage} />
-
+                <RoutePrivate exact path="/company" component={CompanyDetailPage} />
                 <RoutePrivate exact path="/questions/add" component={QuestionsAddPage} />
                 <RoutePrivate exact path="/questions/:questionId" component={QuestionsDetailPage} />
                 <Route exact path="/signin" component={SignInPage} />

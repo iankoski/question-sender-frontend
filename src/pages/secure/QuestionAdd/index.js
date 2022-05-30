@@ -44,6 +44,10 @@ class QuestionAdd extends React.Component {
         } catch (error) {
             console.log('handleSave ' + error);
             this.setState({ showAddedQuestionModal: false });
+            if (error.response && error.response.status === 401) {
+                let errorAuth = 'Sua sessão expirou, faça o login novamente';
+                this.props.history.push(`/errorAuth/${errorAuth}`);
+            }            
             this.setState({ error });
         }
 

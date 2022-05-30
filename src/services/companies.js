@@ -19,6 +19,18 @@ class CompaniesService{
         });
         return result;
     }
+    async set(company){
+        const result = await this.api.post('companies/set', {
+            name: company.name,
+            password: company.password,
+            urlQrCode: company.urlQrCode
+        });
+        return result;
+    }
+    async getCompany(){
+        const result = await this.api.get('/companies');
+        return result.data;
+    }
 }
 
 export default CompaniesService;
