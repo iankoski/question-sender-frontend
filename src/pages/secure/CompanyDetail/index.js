@@ -57,6 +57,15 @@ class CompanyDetails extends React.Component {
         });
         this.props.history.push('/company');
     }
+
+    async handleNewQRCode(){
+        /* Gera um novo QRCode */
+        const companyService = new CompaniesService();
+        const newQRCode = await companyService.getQRCode();
+        console.log('newQRCode '+newQRCode);
+        this.setState({urlQrCode: newQRCode.uuid});
+    }
+
     handleShowSetCompanyModal = () => {
         try {
             /* Se informou algum campo de senha, faz as validações necessárias */

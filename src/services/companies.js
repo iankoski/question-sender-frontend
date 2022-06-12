@@ -31,6 +31,11 @@ class CompaniesService{
         const result = await this.api.get('/companies');
         return result.data;
     }
+
+    async getQRCode(){
+        const result = await this.api.post('/companies/newqrcode');
+        return result.data;
+    }
 }
 
 export default CompaniesService;
