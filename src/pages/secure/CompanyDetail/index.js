@@ -4,7 +4,9 @@ import Footer from '../../../shared/footer';
 import { PageContent, BoxForm } from '../../../shared/styles';
 import { Link, withRouter, useRouteMatch } from 'react-router-dom';
 import CompaniesService from '../../../services/companies';
-import { Container, Button, Form, Alert, Row, Col, Modal, Table } from 'react-bootstrap';
+import { Container, Button, Form, Alert, Row, Col, Modal } from 'react-bootstrap';
+import QRCodeGenerator from '../../../services/util';
+
 class CompanyDetails extends React.Component {
     constructor(props) {
         super(props);
@@ -12,6 +14,7 @@ class CompanyDetails extends React.Component {
             isLoading: true,
             showSetCompanyModal: false,
             showAlteredCompanyModal: false,
+            showNewQRCodeModal: false,
             newPass: '',
             error: '',
             confirmNewPass: '',
@@ -53,25 +56,25 @@ class CompanyDetails extends React.Component {
         /* Redireciona para a página anterior */
         this.setState({
             showSetCompanyModal: false,
-            showAlteredCompanyModal: false
+            showAlteredCompanyModal: false,
+            showNewQRCodeModal: false
         });
         this.props.history.push('/company');
     }
 
-    async handleNewQRCode(){
+    async handleNewQRCode() {
         /* Gera um novo QRCode */
         const companyService = new CompaniesService();
         const newQRCode = await companyService.getQRCode();
-        console.log('newQRCode '+newQRCode);
-        this.setState({urlQrCode: newQRCode.uuid});
+        this.setState({ urlQrCode: newQRCode.uuid, showNewQRCodeModal: true });
     }
 
     handleShowSetCompanyModal = () => {
         try {
             /* Se informou algum campo de senha, faz as validações necessárias */
-            if (!this.state.name){
+            if (!this.state.name) {
                 throw "O nome de exibição deve ser informado";
-            } 
+            }
             if (this.state.newPass || this.state.confirmNewPass) {
                 if (!this.state.newPass || !this.state.confirmNewPass) {
                     throw "A nova senha deve ser informada";
@@ -174,13 +177,19 @@ class CompanyDetails extends React.Component {
                                             </Row>
                                         </Form.Group>
                                         <Col><p>QR Code para responder as perguntas cadastradas</p></Col>
+
                                     </Form>
 
                                 </Row>
-
                                 <Row>
-                                    <Col><p>{isLoading ? (null) : this.state.urlQrCode}</p></Col>
+                                    <Col>
+
+                                        <Link to={`/company/qrcodedetail/${this.state.urlQrCode}`}>
+                                            <QRCodeGenerator urlQrCode={isLoading ? (null) : this.state.urlQrCode}></QRCodeGenerator>
+                                        </Link>
+                                    </Col>
                                 </Row>
+                                <br />
                                 <Row>
                                     <Col>
                                         <Button variant="warning" type="button" onClick={() => { this.handleShowSetCompanyModal() }} >Salvar Alterações</Button>

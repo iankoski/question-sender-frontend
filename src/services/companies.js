@@ -36,6 +36,12 @@ class CompaniesService{
         const result = await this.api.post('/companies/newqrcode');
         return result.data;
     }
+
+    async getCompanyName(id){
+        const result = await this.api.get('/companies/companyname/'+id);
+        console.log('getCompannyname  '+result.data)
+        return result.data;
+    }
 }
 
 export default CompaniesService;
