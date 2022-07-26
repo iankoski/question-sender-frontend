@@ -62,7 +62,7 @@ class SignIn extends React.Component {
                         <Row className="justify-content-md-center" >
                             <Col xs={12} md={6}>
                                 <BoxContent>
-                                    <img src={Logo} alt='QuestionSender' />
+                                    <img src={Logo} alt='QuestionSender'/>
                                 </BoxContent>
                                 <BoxForm>
                                     <h2>Login</h2>

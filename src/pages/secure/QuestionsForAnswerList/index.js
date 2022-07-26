@@ -1,22 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Footer from '../../../shared/footer';
 import { PageContent, BoxForm } from '../../../shared/styles';
 import { Container, Table, Row, Col, Button } from 'react-bootstrap';
 import { Link, useRouteMatch } from 'react-router-dom';
 import QuestionsService from '../../../services/questions';
-import AnswersService from '../../../services/answers';
 import AlternativesService from '../../../services/alternatives';
 import CompaniesService from '../../../services/companies';
 import { dateFormat } from '../../../services/util';
+import Logo from '../../../assets/logo.png';
+import { Icone } from '../../../shared/styles/index';
+function RenderLine({ question , companyId, deviceId}) {
 
-function RenderLine({ question }) {
-    const { url } = useRouteMatch();
-   
     return (
-
         <tr key={question.id}>
             <td>
-                <Link to={`${url}/${question.id}`}>{question.description}</Link>
+                <Link to={`/questionsforanswer/detail/${companyId}/${question.id}/${deviceId}`}>{question.description}</Link>
             </td>
             <td>
                 {dateFormat(question.startDate, 'dd/MM/yyyy')}
@@ -26,14 +24,13 @@ function RenderLine({ question }) {
             </td>
             <td>
                 {question.alternativeDescription}
-            </td>            
+            </td>
         </tr>
     )
 }
 
-function RenderTable({ questions }) {
+function RenderTable({ questions, companyId, deviceId }) {
     return (
-
         <Table responsive striped borderless hover size="sm">
             <thead>
                 <tr>
@@ -43,17 +40,17 @@ function RenderTable({ questions }) {
                 </tr>
             </thead>
             <tbody>
-                {questions.length === 0 && <RenderEmptyRow mensagem="Nenhuma pergunta foi adicionada" />}
-                {questions.map((item) => <RenderLine key={item.id} question={item} />)}
+                {questions.length === 0 && <RenderEmptyRow mensagem="Nenhuma pergunta disponível para responder" />}
+                {questions.map((item) => <RenderLine key={item.id} question={item} companyId={companyId} deviceId={deviceId}/>)}
             </tbody>
         </Table>
     )
 }
 
-function RenderEmptyRow() {
+function RenderEmptyRow({mensagem}) {
     return (
         <tr>
-            <td colSpan='3'>Nenhuma pergunta cadastrada</td>
+            <td colSpan='3'>{mensagem}</td>
         </tr>
     )
 }
@@ -68,73 +65,76 @@ class QuestionsForAnswerList extends React.Component {
             questions: [],
             text: '',
             companyName: '',
-            companyId: ''
+            companyId: 0,
+            deviceId: 0
         }
     }
 
-    async getCompanyName(){
-        try{
+    async getCompanyName() {
+        try {
             const service = new CompaniesService();
             const { params: { companyId } } = this.props.match;
-            const companyName = await service.getCompanyName(companyId);        
-            this.setState({companyName: companyName.companyName, isLoading: false});
-        }catch(error){
-            console.log('getCompanyName: '+error);
+            const companyName = await service.getCompanyName(companyId);
+            this.setState({ companyName: companyName.companyName, isLoading: false, companyId: companyId });
+        } catch (error) {
+            console.log('getCompanyName: ' + error);
         }
 
-    }    
+    }
 
     async componentDidMount() {
         const questionsService = new QuestionsService();
-        const answersService = new AnswersService();
-        const alternativesService = new AlternativesService();
+        const { params: { deviceId, companyId } } = this.props.match;
+
         this.getCompanyName();
         try {
-            const result = await questionsService.getAll();
-
-            for (const [idx, q] of result.entries()) {
-                const mostAnswered = await answersService.getMostAnsweredAlternative(q.id);
-                q['mostAnsweredId'] = mostAnswered;
-                q['alternativeDescription'] = 'SEM RESPOSTAS';
-                if (mostAnswered){
-                    const description = await alternativesService.getOne(mostAnswered);
-                    q['alternativeDescription'] = description.description;
-                }
-            }
+            const result = await questionsService.getQuestionsForAnswer(companyId, deviceId);
             this.setState({
                 isLoading: false,
-                questions: result,
-            });            
-        } catch (error) {            
-            if (error.response && error.response.status === 401) {
-                let errorAuth = 'Sua sessão expirou, faça o login novamente';
-                this.props.history.push(`/errorAuth/${errorAuth}`);
-            }
-            console.log('QuestionsForAnswerList.componentDidMount error '+error)
+                questions: result
+            });
+        } catch (error) {
+            console.log('componentDidMount '+error);
         }
     }
 
     render() {
         const { isLoading, questions } = this.state;
-
+        const { params: { companyId, deviceId } } = this.props.match;
         return (
             <>
-                
-                <PageContent>
-                    <Container>
-                        <BoxForm>
-                            <Row>
-                                <Col>
-                                    <h3>Perguntas</h3>
-                                </Col>
-                            </Row>
-                            <p>Listagem de todas as perguntas válidas a serem respondidas de {isLoading ? (null) : this.state.companyName}.</p>
-                            {!isLoading && <RenderTable questions={questions} />}
-                        </BoxForm>
-                    </Container>
 
-                </PageContent>
-                <Footer text="Clique em uma delas para visualizar as alternativas e responder." />
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}>
+
+                    <Row>
+                        <Col xs={12} md={6} sm={1}>
+                            <img src={Logo} alt='QuestionSender' style={{ width: 200, height: 200 }} />
+                        </Col>
+                    </Row>
+                </div>
+
+                <Row>
+                    <PageContent>
+                        <Container>
+                            <BoxForm>
+                                <Row>
+                                    <Col>
+                                        <h3>Perguntas</h3>
+                                    </Col>
+                                </Row>
+                                <p>Listagem de todas as perguntas válidas a serem respondidas de {isLoading ? (null) : this.state.companyName}.</p>
+                                {!isLoading && <RenderTable questions={questions} companyId={companyId} deviceId={deviceId}/>}
+                            </BoxForm>
+                        </Container>
+
+                    </PageContent>
+                </Row>
+                <Footer text="Clique em uma pergunta para visualizar as alternativas e responder." />
+
             </>
         )
 

@@ -13,6 +13,7 @@ import QuestionsDetailPage from './../pages/secure/QuestionsDetail';
 import CompanyDetailPage from './../pages/secure/CompanyDetail';
 import QrcodeDetailPage from './../pages/secure/QrcodeDetail';
 import QuestionsForAnswerList from './../pages/secure/QuestionsForAnswerList';
+import QuestionsForAnswerDetail from './../pages/secure/QuestionsForAnswerDetail';
 
 import RoutePrivate from './route-wrapper';
 
@@ -27,7 +28,8 @@ export default function Routes() {
                 <RoutePrivate exact path="/company" component={CompanyDetailPage} />
                 <RoutePrivate exact path="/questions/add" component={QuestionsAddPage} />
                 <RoutePrivate exact path="/questions/:questionId" component={QuestionsDetailPage} />
-                <RoutePrivate exact path="/questionsforanswer/:companyId" component={QuestionsForAnswerList} />
+                <Route exact path="/questionsforanswer/:deviceId/:companyId" component={QuestionsForAnswerList} />
+                <Route exact path="/questionsforanswer/detail/:companyId/:questionId/:deviceId" component={QuestionsForAnswerDetail} />
                 <Route exact path="/signin" component={SignInPage} />
                 <Route exact path="/signup" component={SignUpPage} />
             </Switch>

@@ -41,5 +41,15 @@ class QuestionsService {
         const result = await this.api.delete(`questions/${questionId}`);
         return result;
     }
+
+    async getQuestionsForAnswer(companyId, deviceId) {
+        try {
+            const result = await this.api.get(`/questions/date/${deviceId}/${companyId}`);
+            console.log('getQuestionsForAnswer result.data '+result.data.length);
+            return result.data;
+        } catch (error) {
+            console.log(`getQuestionsForAnswer ${error}`);
+        }
+    }
 }
 export default QuestionsService;

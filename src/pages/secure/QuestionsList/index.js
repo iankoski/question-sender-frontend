@@ -32,6 +32,7 @@ function RenderLine({ question }) {
 }
 
 function RenderTable({ questions }) {
+
     return (
 
         <Table responsive striped bordered hover size="sm">
@@ -54,7 +55,7 @@ function RenderTable({ questions }) {
 function RenderEmptyRow() {
     return (
         <tr>
-            <td colspan='3'>Nenhuma pergunta cadastrada</td>
+            <td colSpan='3'>Nenhuma pergunta cadastrada</td>
         </tr>
     )
 }
@@ -75,7 +76,6 @@ class Questions extends React.Component {
         const alternativesService = new AlternativesService();
         try {
             const result = await questionsService.getAll();
-
             for (const [idx, q] of result.entries()) {
                 const mostAnswered = await answersService.getMostAnsweredAlternative(q.id);
                 q['mostAnsweredId'] = mostAnswered;

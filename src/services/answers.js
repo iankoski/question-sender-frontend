@@ -21,5 +21,11 @@ class AnswersService {
         const result = await this.api.get(`/answers/mostanswered/${questionId}`);
         return parseInt(result.data.alternativeId);
     }    
+    async sendAnswer(companyId, questionId, alternativeId, deviceId){
+        const result = await this.api.post(`/answers/`, {
+            companyId, questionId, alternativeId, deviceId
+        });
+        return result;
+    }
 }
 export default AnswersService;
