@@ -19,9 +19,7 @@ class QuestionsService {
 
     async add(questionModel) {
         try {
-            console.log('antes do add ');
             const result = await this.api.post('questions', questionModel);
-            console.log('após do add ');
             return result.data;
         } catch (error) {
             console.log(`addQuestion error: ${error}`);
@@ -45,7 +43,6 @@ class QuestionsService {
     async getQuestionsForAnswer(companyId, deviceId) {
         try {
             const result = await this.api.get(`/questions/date/${deviceId}/${companyId}`);
-            console.log('getQuestionsForAnswer result.data '+result.data.length);
             return result.data;
         } catch (error) {
             console.log(`getQuestionsForAnswer ${error}`);

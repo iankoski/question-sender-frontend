@@ -1,7 +1,8 @@
 /* ENUM que retorna todos os endpoints */
+const host = '192.168.0.103';
 export default {
-    API_COMPANIES: 'http://localhost:5001',
-    API_ALTERNATIVES: 'http://localhost:5004',
-    API_QUESTIONS: 'http://localhost:5005',
-    API_ANSWERS: 'http://localhost:5003'
+    API_COMPANIES: `http://${host}:5001`,
+    API_ALTERNATIVES: `http://${host}:5004`,
+    API_QUESTIONS: `http://${host}:5005`,
+    API_ANSWERS: `http://${host}:5003`
 }

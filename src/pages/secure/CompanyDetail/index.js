@@ -2,7 +2,7 @@ import React from 'react';
 import Header from '../../../shared/header';
 import Footer from '../../../shared/footer';
 import { PageContent, BoxForm } from '../../../shared/styles';
-import { Link, withRouter, useRouteMatch } from 'react-router-dom';
+import { Link  } from 'react-router-dom';
 import CompaniesService from '../../../services/companies';
 import { Container, Button, Form, Alert, Row, Col, Modal } from 'react-bootstrap';
 import QRCodeGenerator from '../../../services/util';
@@ -20,7 +20,8 @@ class CompanyDetails extends React.Component {
             confirmNewPass: '',
             userName: '',
             urlQrCode: '',
-            name: ''
+            name: '',
+            companyId: ''
 
         }
     }
@@ -30,12 +31,12 @@ class CompanyDetails extends React.Component {
         try {
             const companyService = new CompaniesService();
             const company = await companyService.getCompany();
-
             this.setState({
                 userName: company.userName,
                 urlQrCode: company.urlQrCode,
                 name: company.name,
-                isLoading: false
+                isLoading: false,
+                companyId: company.id
             })
 
         } catch (error) {
@@ -184,8 +185,8 @@ class CompanyDetails extends React.Component {
                                 <Row>
                                     <Col>
 
-                                        <Link to={`/company/qrcodedetail/${this.state.urlQrCode}`}>
-                                            <QRCodeGenerator urlQrCode={isLoading ? (null) : this.state.urlQrCode}></QRCodeGenerator>
+                                        <Link to={`/company/qrcodedetail/${this.state.companyId}/companyuid/${this.state.urlQrCode}`}>
+                                            <QRCodeGenerator urlQrCode={isLoading ? (null) : `${this.state.companyId}/companyuid/${this.state.urlQrCode}`}></QRCodeGenerator>
                                         </Link>
                                     </Col>
                                 </Row>

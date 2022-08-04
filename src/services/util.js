@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import QRCode from 'react-qr-code';
+import CompaniesService from './companies';
 
 function dateFormat(oldDate, newFormat) {
     const { format, utcToZonedTime } = require("date-fns-tz");
@@ -47,13 +48,12 @@ function validateQuestionAndAlternatives(description, startDate, endDate, altern
     return null;
 }
 
-
-
 function QRCodeGenerator(urlQrCode) {
 
     const [back, setBack] = useState('#FFFFFF');
     const [fore, setFore] = useState('#000000');
     const [size, setSize] = useState(200);
+
     return (
         <div className="QRCodeGenerator">
 
@@ -65,13 +65,39 @@ function QRCodeGenerator(urlQrCode) {
                         fgColor={fore}
                         size={size === '' ? 0 : size}
                     />
-                )}
-       
+                )}       
         </div>
     );
+}
+
+function validateSecret(secret){
+    try{
+        if (secret.trim() !== "82ad4f00-0d34-11ed-861d-0242ac120002"){
+            console.log('validate secret returning false '+secret.length);
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.log(`validateSecret ${error}`);
+    }
+    
+}
+
+async function validateUid(companyId, companyUid){
+    try{
+        const service = new CompaniesService();
+        const uid = await service.getCompanyUid(companyId);
+        if (companyUid !== uid.companyUid){
+            console.log('validateUid returning false companyId '+companyId + ' companyUid '+companyUid + ' uid.companyUid '+uid.companyUid );
+            return false;
+        }
+        return true;
+    }catch(error){
+        console.log(`validateUid ${error}`);
+    }
 }
 
 export default QRCodeGenerator;
 
 
-export { dateFormat, validateQuestionAndAlternatives };
+export { dateFormat, validateQuestionAndAlternatives, validateSecret, validateUid };

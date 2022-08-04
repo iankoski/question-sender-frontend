@@ -3,9 +3,8 @@ import Footer from '../../../shared/footer';
 import { PageContent, BoxForm, AlternativeLetter } from '../../../shared/styles';
 import QuestionsService from '../../../services/questions';
 import AlternativesService from '../../../services/alternatives';
-import { dateFormat, validateQuestionAndAlternatives } from '../../../services/util';
-import { Link, withRouter, useRouteMatch } from 'react-router-dom';
-import { Container, Button, Form, Alert, Row, Col, Modal, Table } from 'react-bootstrap';
+import { dateFormat } from '../../../services/util';
+import { Container, Button, Form, Alert, Row, Col, Modal } from 'react-bootstrap';
 import Logo from '../../../assets/logo.png';
 import AnswersService from '../../../services/answers';
 
@@ -44,7 +43,7 @@ class QuestionsForAnswerDetail extends React.Component {
                 endDate: this.state.question.endDate,
             })
         } catch (error) {
-            console.log(`getQuestion ${error}`);
+            console.log(`getQuestion ${error.response.data}`);
         }
 
     }
@@ -60,7 +59,7 @@ class QuestionsForAnswerDetail extends React.Component {
                 alternatives: result
             });
         } catch (error) {
-            console.log('getAlternatives ' + error);
+            console.log('getAlternatives ' + error.response.data);
             if (error.response.status === 401) {
                 this.props.history.push('/');
             }
@@ -73,6 +72,9 @@ class QuestionsForAnswerDetail extends React.Component {
             event.preventDefault();
             const { params: { companyId, questionId, deviceId } } = this.props.match;
             const alternativeId = this.state.selectedAlternative;
+            if (!alternativeId){
+                throw "É necessário selecionar uma alternativa";
+            }            
             const answersService = new AnswersService();
 
             await answersService.sendAnswer(companyId, questionId, alternativeId, deviceId);
@@ -80,7 +82,7 @@ class QuestionsForAnswerDetail extends React.Component {
             this.setState({ showSentAnswerModal: true });
 
         } catch (error) {
-            console.log('handleSave: ' + error);
+            console.log('handleSave: ' + error.response.data);
             this.setState({ showSentAnswerModal: false });
             this.setState({ error });
         }
@@ -94,7 +96,7 @@ class QuestionsForAnswerDetail extends React.Component {
             await this.getQuestion(questionId);
             await this.getAlternatives(questionId);
         } catch (error) {
-            console.log('componentDidMount ' + error);
+            console.log('componentDidMount ' + error.response.data);
         }
     }
 
@@ -104,15 +106,14 @@ class QuestionsForAnswerDetail extends React.Component {
         )
     }
 
-    handleRedirectModal = () => {
+    handleRedirect = () => {
         /* Redireciona para a página anterior */
-        const { params: { companyId, questionId, deviceId } } = this.props.match;
-        this.props.history.push(`/questionsforanswer/${deviceId}/${companyId}`);
+        const { params: { companyId, questionId, deviceId, companyuid, secret } } = this.props.match;
+        this.props.history.push(`/questionsforanswer/${deviceId}/${companyId}/companyuid/${companyuid}/secret/${secret}`);
     }
 
     handleChangeRadio = (event) => {
         this.setState({ selectedAlternative: event.target.value });
-        console.log('handleChangeRadio ' + this.state.selectedAlternative + ' event.target.value ' + event.target.value);
     }
 
     render() {
@@ -198,7 +199,7 @@ class QuestionsForAnswerDetail extends React.Component {
                                         </Col>
 
                                         <Col >
-                                            <Link className="btn btn-link float-end" to="/questions">Voltar</Link>
+                                            <Button className="float-end" type="button" variant="outline-secondary" onClick={() => { this.handleRedirect() }}>Voltar</Button>
                                         </Col>
                                     </Row>
 
@@ -207,7 +208,7 @@ class QuestionsForAnswerDetail extends React.Component {
                                             <Modal.Title>Resposta enviada com sucesso</Modal.Title>
                                         </Modal.Header>
                                         <Modal.Footer>
-                                            <Button variant="success" type="button" onClick={() => { this.handleRedirectModal() }}>OK</Button>
+                                            <Button variant="success" type="button" onClick={() => { this.handleRedirect() }}>OK</Button>
                                         </Modal.Footer>
                                     </Modal>
 

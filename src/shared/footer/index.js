@@ -7,7 +7,7 @@ function Footer({ text }) {
 
     return (
         <FooterStyle >
-            <footer className="footer justify-content-center">              
+            <footer className="justify-content-center">              
                 <Nav.Item>
                     <p>{text}</p>
                 </Nav.Item>         

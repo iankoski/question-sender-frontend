@@ -6,7 +6,7 @@ import { Container, Button, Form, Alert, Row, Col, Modal } from 'react-bootstrap
 import { validateQuestionAndAlternatives } from '../../../services/util';
 import QuestionsService from '../../../services/questions';
 import AlternativesService from '../../../services/alternatives';
-import { withRouter, Link, useHistory } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 
 class QuestionAdd extends React.Component {
     constructor(props) {

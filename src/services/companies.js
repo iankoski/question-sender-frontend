@@ -1,5 +1,6 @@
 import baseAPI from './api';
 import baseURLs from '../configs/baseURLs';
+import axios from 'axios';
 
 class CompaniesService{
     constructor(){
@@ -14,13 +15,17 @@ class CompaniesService{
     }
     /* Faz o POST para a API fazer o LOGIN */
     async login(userName, password){
-        const result = await this.api.post('companies/login', {
+        /*const result = axios.post('http://192.168.0.103:5001/companies/login', {
+            userName, password
+        });*/
+        
+        const result = await this.api.post('/companies/login', {
             userName, password
         });
         return result;
     }
     async set(company){
-        const result = await this.api.post('companies/set', {
+        const result = await this.api.post('/companies/set', {
             name: company.name,
             password: company.password,
             urlQrCode: company.urlQrCode
@@ -39,8 +44,12 @@ class CompaniesService{
 
     async getCompanyName(id){
         const result = await this.api.get('/companies/companyname/'+id);
-        console.log('getCompannyname  '+result.data)
         return result.data;
+    }
+
+    async getCompanyUid(id){
+        const result = await this.api.get('/companies/companyuid/'+id);
+        return result.data;        
     }
 }
 

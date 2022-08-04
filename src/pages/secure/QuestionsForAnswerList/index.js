@@ -1,20 +1,19 @@
 import React from 'react';
 import Footer from '../../../shared/footer';
 import { PageContent, BoxForm } from '../../../shared/styles';
-import { Container, Table, Row, Col, Button } from 'react-bootstrap';
-import { Link, useRouteMatch } from 'react-router-dom';
+import { Container, Table, Row, Col } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import QuestionsService from '../../../services/questions';
-import AlternativesService from '../../../services/alternatives';
 import CompaniesService from '../../../services/companies';
-import { dateFormat } from '../../../services/util';
+import { dateFormat, validateSecret, validateUid } from '../../../services/util';
 import Logo from '../../../assets/logo.png';
 import { Icone } from '../../../shared/styles/index';
-function RenderLine({ question , companyId, deviceId}) {
+function RenderLine({ question , companyId, deviceId, secret, companyuid}) {
 
     return (
         <tr key={question.id}>
             <td>
-                <Link to={`/questionsforanswer/detail/${companyId}/${question.id}/${deviceId}`}>{question.description}</Link>
+                <Link to={`/questionsforanswer/detail/${companyId}/${question.id}/${deviceId}/companyuid/${companyuid}/secret/${secret} `}>{question.description}</Link>
             </td>
             <td>
                 {dateFormat(question.startDate, 'dd/MM/yyyy')}
@@ -29,7 +28,7 @@ function RenderLine({ question , companyId, deviceId}) {
     )
 }
 
-function RenderTable({ questions, companyId, deviceId }) {
+function RenderTable({ questions, companyId, deviceId, secret, companyuid }) {
     return (
         <Table responsive striped borderless hover size="sm">
             <thead>
@@ -41,7 +40,7 @@ function RenderTable({ questions, companyId, deviceId }) {
             </thead>
             <tbody>
                 {questions.length === 0 && <RenderEmptyRow mensagem="Nenhuma pergunta disponível para responder" />}
-                {questions.map((item) => <RenderLine key={item.id} question={item} companyId={companyId} deviceId={deviceId}/>)}
+                {questions.map((item) => <RenderLine key={item.id} question={item} companyId={companyId} deviceId={deviceId} secret={secret} companyuid={companyuid}/>)}
             </tbody>
         </Table>
     )
@@ -54,7 +53,6 @@ function RenderEmptyRow({mensagem}) {
         </tr>
     )
 }
-
 
 
 class QuestionsForAnswerList extends React.Component {
@@ -75,6 +73,7 @@ class QuestionsForAnswerList extends React.Component {
             const service = new CompaniesService();
             const { params: { companyId } } = this.props.match;
             const companyName = await service.getCompanyName(companyId);
+
             this.setState({ companyName: companyName.companyName, isLoading: false, companyId: companyId });
         } catch (error) {
             console.log('getCompanyName: ' + error);
@@ -84,9 +83,18 @@ class QuestionsForAnswerList extends React.Component {
 
     async componentDidMount() {
         const questionsService = new QuestionsService();
-        const { params: { deviceId, companyId } } = this.props.match;
-
-        this.getCompanyName();
+        const { params: { companyId, deviceId, secret, companyuid } } = this.props.match;
+        /* Caso o secret não seja o mesmo que foi enviado pelo APP Perguntador, redireciona para a página de erro */
+        console.log('componentDidMount list secret '+ secret);
+        if (!validateSecret(secret)){
+            this.props.history.push(`/questionsforanswer/${companyId}`);
+        }
+        /* Valida se o unique id que está vindo da requisição é o último que foi gerado para a url do qr code da company */
+        if (! await validateUid(companyId, companyuid)){
+            console.log('dentro do if');
+            this.props.history.push(`/questionsforanswer/${companyId}`);
+        }
+        await this.getCompanyName();
         try {
             const result = await questionsService.getQuestionsForAnswer(companyId, deviceId);
             this.setState({
@@ -100,7 +108,7 @@ class QuestionsForAnswerList extends React.Component {
 
     render() {
         const { isLoading, questions } = this.state;
-        const { params: { companyId, deviceId } } = this.props.match;
+        const { params: { companyId, deviceId, secret, companyuid } } = this.props.match;
         return (
             <>
 
@@ -127,7 +135,7 @@ class QuestionsForAnswerList extends React.Component {
                                     </Col>
                                 </Row>
                                 <p>Listagem de todas as perguntas válidas a serem respondidas de {isLoading ? (null) : this.state.companyName}.</p>
-                                {!isLoading && <RenderTable questions={questions} companyId={companyId} deviceId={deviceId}/>}
+                                {!isLoading && <RenderTable questions={questions} companyId={companyId} deviceId={deviceId} secret={secret} companyuid={companyuid}/>}
                             </BoxForm>
                         </Container>
 

@@ -7,8 +7,7 @@ import CompaniesService from '../../../services/companies';
 import { login } from '../../../services/auth';
 import Footer from '../../../shared/footer';
 import { PageContent } from '../../../shared/styles';
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+
 
 class SignIn extends React.Component {
     state = {

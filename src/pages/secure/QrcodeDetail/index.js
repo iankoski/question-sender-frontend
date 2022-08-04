@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, Col, Alert } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import Logo from '../../../assets/logo.png';
 import { BoxContent } from '../../../shared/styles';
 import { withRouter } from 'react-router-dom';
@@ -11,14 +11,16 @@ import { PageContent } from '../../../shared/styles';
 class QrCodeDetail extends React.Component {
     state = {
         qrcode: '',
+        companyId: '',
         isLoading: true
     };
 
     async componentDidMount() {
         try {
-            const { params: { qrcode } } = this.props.match;
+            const { params: { companyId, qrcode } } = this.props.match;
             this.setState({
                 qrcode: qrcode,
+                companyId: companyId,
                 isLoading: false
             })
 
@@ -31,7 +33,7 @@ class QrCodeDetail extends React.Component {
     }
 
     render() {
-        const { qrcode, isLoading } = this.state;
+        const { qrcode, isLoading, companyId } = this.state;
         return (
             <>
                 <PageContent>
@@ -50,7 +52,7 @@ class QrCodeDetail extends React.Component {
                 <div className="d-flex justify-content-center">
                     <Row  >
                         <Col xs={12} md={6}>
-                            <QRCodeGenerator urlQrCode={isLoading ? (null) : qrcode}></QRCodeGenerator>
+                            <QRCodeGenerator urlQrCode={isLoading ? (null) : `${companyId}/companyuid/${qrcode}`}></QRCodeGenerator>
                         </Col>
                     </Row>
                 </div> 

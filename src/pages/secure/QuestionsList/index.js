@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React  from 'react';
 import Header from '../../../shared/header';
 import Footer from '../../../shared/footer';
 import { PageContent, BoxForm } from '../../../shared/styles';
-import { Container, Table, Row, Col, Button } from 'react-bootstrap';
-import { Link, withRouter, useRouteMatch } from 'react-router-dom';
+import { Container, Table, Row, Col } from 'react-bootstrap';
+import { Link,  useRouteMatch } from 'react-router-dom';
 import QuestionsService from '../../../services/questions';
 import AnswersService from '../../../services/answers';
 import AlternativesService from '../../../services/alternatives';
