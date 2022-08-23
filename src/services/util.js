@@ -18,11 +18,13 @@ function validateQuestionAndAlternatives(description, startDate, endDate, altern
         throw "Uma pergunta deve ter entre 10 e 150 caracteres";
     }
     if (!description || !startDate || !endDate) {
-        console.log('12');
         throw "Informe todos os campos para adicionar ou alterar a pergunta";
-    }
+    }    
+    if ((startDate.getTime() !== startDate) 
+        || endDate.getTime() !== endDate){
+            throw "Informe data(s) válida(s)";
+        }
     if (startDate.getTime() >= endDate.getTime()) {
-        console.log('3');
         throw "A data que a pergunta inicia deve ser menor a data que ela termina";;
     }
     if (alternatives.length < 2 || !alternatives ) {
@@ -30,7 +32,6 @@ function validateQuestionAndAlternatives(description, startDate, endDate, altern
     }
     if (sendingStatus === 'alter') {
         alternatives.map((a) => {
-            console.log('4 ' + alternatives.length);
             if (a.description.trim().length < 5 || a.description.trim().length >= 150) {
                 throw "Uma alternativa válida deve ter entre 5 e 150 caracteres";
             }

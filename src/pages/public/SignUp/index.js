@@ -31,7 +31,7 @@ class SignUp extends React.Component {
                 this.props.history.push("/signin");
             } catch (error) {
                 console.log(error);
-                this.setState({ error: 'Ocorreu um erro durante a criação da conta' });
+                this.setState({ error: 'Ocorreu um erro durante a criação da conta: '+error });
             }
         }
     }

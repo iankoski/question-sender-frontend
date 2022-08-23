@@ -19,6 +19,9 @@ height: 3%;`;
 
 export const PageContent = styled.div`
     padding: 30px 0;
+    margin-left: 3%;
+    margin-right: 3%;
+    margin-top: 3%;
 `;
 export const Icone = styled.img`
     max-width: 100%;

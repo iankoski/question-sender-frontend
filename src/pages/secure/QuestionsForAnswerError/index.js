@@ -20,7 +20,6 @@ class QuestionsForAnswerError extends React.Component {
     async componentDidMount() {
         try {
             const { params: { companyId } } = this.props.match;
-            console.log('companyId 1 '+companyId);
             const service = new CompaniesService();
             
             const companyName = await service.getCompanyName(companyId);            

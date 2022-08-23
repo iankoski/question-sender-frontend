@@ -6,7 +6,7 @@ import QuestionsService from '../../../services/questions';
 import AlternativesService from '../../../services/alternatives';
 import AnswersService from '../../../services/answers';
 import { dateFormat, validateQuestionAndAlternatives } from '../../../services/util';
-import { Link, withRouter, useRouteMatch } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Container, Button, Form, Alert, Row, Col, Modal, Table } from 'react-bootstrap';
 class QuestionDetails extends React.Component {
     constructor(props) {
@@ -120,7 +120,6 @@ class QuestionDetails extends React.Component {
 
     handleDeleteModal() {
         this.setState({ showDeleteModal: true });
-        console.log(`handleDeleteModal ${this.state.showDeleteModal}`);
     }
 
     handleSetAlternative = (element, index) => {
@@ -140,7 +139,6 @@ class QuestionDetails extends React.Component {
 
     handleCancelDelete() {
         this.setState({ showDeleteModal: false });
-        console.log(`handleDeleteModal ${this.state.showDeleteModal}`);
     }
     handleDeleteQuestion = async (event) => {
         event.preventDefault();

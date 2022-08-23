@@ -24,7 +24,6 @@ class QuestionAdd extends React.Component {
 
     handleAddedQuestionModal() {
         this.setState({ showAddedQuestionModal: true });        
-        console.log(`handleAddedQuestionModal ${this.state.showAddedQuestionModal}`);
     }
 
     handleSave = async (event) => {

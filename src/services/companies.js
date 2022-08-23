@@ -10,8 +10,15 @@ class CompaniesService{
     async signup(userModel){
         /* Faz o POST para a api e retorna o resultado para o front 
          * Sign Up no caso*/
-        const result = await this.api.post('companies', userModel);
-        return result;
+        try{
+            const result = await this.api.post('companies', userModel);
+            return result;
+        }catch(error){
+            if (error.response && error.response.status === 403){
+                throw error.response.data;
+            }
+            console.log(`companiesService.signup ${error}`);
+        }        
     }
     /* Faz o POST para a API fazer o LOGIN */
     async login(userName, password){

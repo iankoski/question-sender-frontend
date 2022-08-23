@@ -7,8 +7,7 @@ import QuestionsService from '../../../services/questions';
 import CompaniesService from '../../../services/companies';
 import { dateFormat, validateSecret, validateUid } from '../../../services/util';
 import Logo from '../../../assets/logo.png';
-import { Icone } from '../../../shared/styles/index';
-function RenderLine({ question , companyId, deviceId, secret, companyuid}) {
+function RenderLine({ question, companyId, deviceId, secret, companyuid }) {
 
     return (
         <tr key={question.id}>
@@ -40,13 +39,13 @@ function RenderTable({ questions, companyId, deviceId, secret, companyuid }) {
             </thead>
             <tbody>
                 {questions.length === 0 && <RenderEmptyRow mensagem="Nenhuma pergunta disponível para responder" />}
-                {questions.map((item) => <RenderLine key={item.id} question={item} companyId={companyId} deviceId={deviceId} secret={secret} companyuid={companyuid}/>)}
+                {questions.map((item) => <RenderLine key={item.id} question={item} companyId={companyId} deviceId={deviceId} secret={secret} companyuid={companyuid} />)}
             </tbody>
         </Table>
     )
 }
 
-function RenderEmptyRow({mensagem}) {
+function RenderEmptyRow({ mensagem }) {
     return (
         <tr>
             <td colSpan='3'>{mensagem}</td>
@@ -85,13 +84,11 @@ class QuestionsForAnswerList extends React.Component {
         const questionsService = new QuestionsService();
         const { params: { companyId, deviceId, secret, companyuid } } = this.props.match;
         /* Caso o secret não seja o mesmo que foi enviado pelo APP Perguntador, redireciona para a página de erro */
-        console.log('componentDidMount list secret '+ secret);
-        if (!validateSecret(secret)){
+        if (!validateSecret(secret)) {
             this.props.history.push(`/questionsforanswer/${companyId}`);
         }
         /* Valida se o unique id que está vindo da requisição é o último que foi gerado para a url do qr code da company */
-        if (! await validateUid(companyId, companyuid)){
-            console.log('dentro do if');
+        if (! await validateUid(companyId, companyuid)) {
             this.props.history.push(`/questionsforanswer/${companyId}`);
         }
         await this.getCompanyName();
@@ -102,7 +99,7 @@ class QuestionsForAnswerList extends React.Component {
                 questions: result
             });
         } catch (error) {
-            console.log('componentDidMount '+error);
+            console.log('componentDidMount ' + error);
         }
     }
 
@@ -111,22 +108,22 @@ class QuestionsForAnswerList extends React.Component {
         const { params: { companyId, deviceId, secret, companyuid } } = this.props.match;
         return (
             <>
+                <PageContent>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}>
 
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}>
+                        <Row>
+                            <Col >
+                                <img src={Logo} alt='QuestionSender' style={{ width: 200, height: 200 }} />
+                            </Col>
+                        </Row>
+                    </div>
 
                     <Row>
-                        <Col xs={12} md={6} sm={1}>
-                            <img src={Logo} alt='QuestionSender' style={{ width: 200, height: 200 }} />
-                        </Col>
-                    </Row>
-                </div>
 
-                <Row>
-                    <PageContent>
                         <Container>
                             <BoxForm>
                                 <Row>
@@ -135,14 +132,15 @@ class QuestionsForAnswerList extends React.Component {
                                     </Col>
                                 </Row>
                                 <p>Listagem de todas as perguntas válidas a serem respondidas de {isLoading ? (null) : this.state.companyName}.</p>
-                                {!isLoading && <RenderTable questions={questions} companyId={companyId} deviceId={deviceId} secret={secret} companyuid={companyuid}/>}
+                                {!isLoading && <RenderTable questions={questions} companyId={companyId} deviceId={deviceId} secret={secret} companyuid={companyuid} />}
                             </BoxForm>
                         </Container>
 
-                    </PageContent>
-                </Row>
-                <Footer text="Clique em uma pergunta para visualizar as alternativas e responder." />
 
+                    </Row>
+
+                    <Footer text="Clique em uma pergunta para visualizar as alternativas e responder." />
+                </PageContent>
             </>
         )
 
