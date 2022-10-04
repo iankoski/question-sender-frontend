@@ -12,7 +12,8 @@ class QuestionsForAnswerError extends React.Component {
             questionId: '',
             companyId: '',
             deviceId: '',
-            companyName: ''
+            companyName: '',
+            error: ''
         }
     }
 
@@ -22,11 +23,10 @@ class QuestionsForAnswerError extends React.Component {
             const { params: { companyId } } = this.props.match;
             const service = new CompaniesService();
             
-            const companyName = await service.getCompanyName(companyId);            
-            throw `Para responder as perguntas de ${companyName.companyName} acesse esse QR Code pelo APP Perguntador`;
+            const companyName = await service.getCompanyName(companyId);          
+            this.setState({error: `Para responder as perguntas de ${companyName.companyName} acesse esse QR Code pelo APP Perguntador`});
         } catch (error) {
             console.log('componentDidMount '+error);
-            this.setState({error: error})
         }
     }
 

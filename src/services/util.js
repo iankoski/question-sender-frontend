@@ -9,6 +9,31 @@ function dateFormat(oldDate, newFormat) {
     return format(timeInBritishsbane, newFormat);
 }
 
+function validateNews(description, startDate, endDate, title){
+    if (!description) {
+        throw "Informe uma notícia válida";
+    }
+    if (!title){
+        throw "Informe um título válido para a nóticia";
+    }
+    if (title.trim().length < 5 || !title || title.trim().length >= 60) {
+        throw "Uma notícia deve ter entre 5 e 60 caracteres";
+    } 
+    if (description.trim().length < 10 || !description || description.trim().length >= 2000) {
+        throw "Uma notícia deve ter entre 10 e 2000 caracteres";
+    } 
+    if ((startDate.getTime() !== startDate.getTime()) 
+        || endDate.getTime() !== endDate.getTime()){
+            throw "Informe data(s) válida(s)";
+        }     
+    if (!description || !startDate || !endDate) {
+        throw "Informe todos os campos para adicionar ou alterar a notícia";
+    }      
+    if (startDate.getTime() > endDate.getTime()) {
+        throw "A data que a notícia inicia deve ser menor a data que ela termina";;
+    }       
+}
+
 function validateQuestionAndAlternatives(description, startDate, endDate, alternatives, sendingStatus) {
 
     if (!description) {
@@ -20,8 +45,9 @@ function validateQuestionAndAlternatives(description, startDate, endDate, altern
     if (!description || !startDate || !endDate) {
         throw "Informe todos os campos para adicionar ou alterar a pergunta";
     }    
-    if ((startDate.getTime() !== startDate) 
-        || endDate.getTime() !== endDate){
+
+    if ((startDate.getTime() !== startDate.getTime()) 
+        || endDate.getTime() !== endDate.getTime()){
             throw "Informe data(s) válida(s)";
         }
     if (startDate.getTime() >= endDate.getTime()) {
@@ -101,4 +127,4 @@ async function validateUid(companyId, companyUid){
 export default QRCodeGenerator;
 
 
-export { dateFormat, validateQuestionAndAlternatives, validateSecret, validateUid };
+export { dateFormat, validateQuestionAndAlternatives, validateSecret, validateUid, validateNews };

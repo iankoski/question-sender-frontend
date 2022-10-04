@@ -19,8 +19,9 @@ function MainMenu({ history }) {
                         <Logo src={Icone} alt='Question-Sender' />
                     </Navbar.Brand>
                     <Nav>
-                        <Nav.Link href="/questions">Perguntas</Nav.Link>                  
-                        <Nav.Link href="/company">Minha Conta</Nav.Link>
+                        <Nav.Link href="/questions">Perguntas</Nav.Link>  
+                        <Nav.Link href="/news/company">Quadro de Notícias</Nav.Link>                
+                        <Nav.Link href="/company">Minha Conta</Nav.Link>                        
                     </Nav>
                     <Nav>
                         <Nav.Link onClick={handleLogout}>Sair</Nav.Link>

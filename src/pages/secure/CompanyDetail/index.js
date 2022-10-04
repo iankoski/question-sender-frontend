@@ -31,6 +31,7 @@ class CompanyDetails extends React.Component {
         try {
             const companyService = new CompaniesService();
             const company = await companyService.getCompany();
+            
             this.setState({
                 userName: company.userName,
                 urlQrCode: company.urlQrCode,
@@ -125,7 +126,6 @@ class CompanyDetails extends React.Component {
 
     render() {
         const { isLoading, question } = this.state;
-
         return (
             <>
                 <Header />
@@ -184,7 +184,6 @@ class CompanyDetails extends React.Component {
                                 </Row>
                                 <Row>
                                     <Col>
-
                                         <Link to={`/company/qrcodedetail/${this.state.companyId}/companyuid/${this.state.urlQrCode}`}>
                                             <QRCodeGenerator urlQrCode={isLoading ? (null) : `${this.state.companyId}/companyuid/${this.state.urlQrCode}`}></QRCodeGenerator>
                                         </Link>
@@ -218,7 +217,7 @@ class CompanyDetails extends React.Component {
 
                                 <Modal show={this.state.showNewQRCodeModal}>
                                     <Modal.Header>
-                                        <Modal.Title>Novo QR Code gerado com sucesso!</Modal.Title>
+                                        <Modal.Title>Novo QR Code gerado com sucesso! Salve as alterações para confirmar!</Modal.Title>
                                     </Modal.Header>
                                     <Modal.Footer>
                                         <Button variant="success" type="button" onClick={() => { this.handleRedirectModal() }}>OK</Button>

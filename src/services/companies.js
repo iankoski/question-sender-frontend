@@ -41,6 +41,7 @@ class CompaniesService{
     }
     async getCompany(){
         const result = await this.api.get('/companies');
+console.log('otro teste '+result.data.urlQrCode);
         return result.data;
     }
 

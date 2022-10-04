@@ -15,10 +15,18 @@ import QrcodeDetailPage from './../pages/secure/QrcodeDetail';
 import QuestionsForAnswerList from './../pages/secure/QuestionsForAnswerList';
 import QuestionsForAnswerDetail from './../pages/secure/QuestionsForAnswerDetail';
 import QuestionsForAnswerError from './../pages/secure/QuestionsForAnswerError';
+import NewsList from './../pages/secure/NewsList';
+import NewsAdd from './../pages/secure/NewsAdd';
+import NewsDetail from './../pages/secure/NewsDetail';
 
 import RoutePrivate from './route-wrapper';
 
 export default function Routes() {
+    /*
+                    <Route exact path="/questionsforanswer/:deviceId/:companyId/companyuid/:companyuid" component={QuestionsForAnswerError} />
+                <Route exact path="/questionsforanswer/detail/:companyId/:questionId/:deviceId" component={QuestionsForAnswerError} />
+                <Route exact path="/questionsforanswer/:companyId/:questionId" component={QuestionsForAnswerError} />
+    */
     return (
         <Router>
             <Switch>
@@ -31,10 +39,10 @@ export default function Routes() {
                 <RoutePrivate exact path="/questions/:questionId" component={QuestionsDetailPage} />
                 <Route exact path="/questionsforanswer/:deviceId/:companyId/companyuid/:companyuid/secret/:secret" component={QuestionsForAnswerList} />
                 <Route exact path="/questionsforanswer/detail/:companyId/:questionId/:deviceId/companyuid/:companyuid/secret/:secret" component={QuestionsForAnswerDetail} />
-                <Route exact path="/questionsforanswer/:deviceId/:companyId/companyuid/:companyuid" component={QuestionsForAnswerError} />
-                <Route exact path="/questionsforanswer/detail/:companyId/:questionId/:deviceId" component={QuestionsForAnswerError} />
-                <Route exact path="/questionsforanswer/:companyId/:questionId" component={QuestionsForAnswerError} />
-                <Route exact path="/questionsforanswer/:companyId" component={QuestionsForAnswerError} />
+                <Route exact path="/questionsforanswer/error/:companyId" component={QuestionsForAnswerError} />
+                <Route exact path="/news/company" component={NewsList} />
+                <Route exact path="/news/company/add/:newsId" component={NewsDetail} />
+                <Route exact path="/news/add" component={NewsAdd} />
                 <Route exact path="/signin" component={SignInPage} />
                 <Route exact path="/signup" component={SignUpPage} />
             </Switch>
