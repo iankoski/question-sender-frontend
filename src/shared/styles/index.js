@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 
-export const BoxContent = styled.div`
-    padding: 30px 15px;
+export const BoxContent = styled.div`   
     text-align: center;`;
 
 export const BoxForm = styled.div`

@@ -1,9 +1,9 @@
-import React  from 'react';
+import React from 'react';
 import Header from '../../../shared/header';
 import Footer from '../../../shared/footer';
 import { PageContent, BoxForm } from '../../../shared/styles';
 import { Container, Table, Row, Col } from 'react-bootstrap';
-import { Link,  useRouteMatch } from 'react-router-dom';
+import { Link, useRouteMatch } from 'react-router-dom';
 import QuestionsService from '../../../services/questions';
 import AnswersService from '../../../services/answers';
 import AlternativesService from '../../../services/alternatives';
@@ -11,12 +11,13 @@ import { dateFormat } from '../../../services/util';
 
 function RenderLine({ question }) {
     const { url } = useRouteMatch();
-   
+
     return (
 
         <tr key={question.id}>
             <td>
-                <Link to={`${url}/${question.id}`}>{question.description}</Link>
+                <Link to={{pathname: `${url}/${question.id}`,
+                           state: question}}>{question.description}</Link>
             </td>
             <td>
                 {dateFormat(question.startDate, 'dd/MM/yyyy')}
@@ -26,7 +27,7 @@ function RenderLine({ question }) {
             </td>
             <td>
                 {question.alternativeDescription}
-            </td>            
+            </td>
         </tr>
     )
 }
@@ -80,7 +81,7 @@ class Questions extends React.Component {
                 const mostAnswered = await answersService.getMostAnsweredAlternative(q.id);
                 q['mostAnsweredId'] = mostAnswered;
                 q['alternativeDescription'] = 'SEM RESPOSTAS';
-                if (mostAnswered){
+                if (mostAnswered) {
                     const description = await alternativesService.getOne(mostAnswered);
                     q['alternativeDescription'] = description.description;
                 }
@@ -88,8 +89,8 @@ class Questions extends React.Component {
             this.setState({
                 isLoading: false,
                 questions: result,
-            });            
-        } catch (error) {            
+            });
+        } catch (error) {
             if (error.response && error.response.status === 401) {
                 let errorAuth = 'Sua sessão expirou, faça o login novamente';
                 this.props.history.push(`/errorAuth/${errorAuth}`);

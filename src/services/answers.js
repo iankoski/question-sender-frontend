@@ -27,5 +27,9 @@ class AnswersService {
         });
         return result;
     }
+    async getAnswersCount(alternatives){
+        const result = await this.api.post('/answers/answerscount', {alternatives});
+        return result;
+    }
 }
 export default AnswersService;

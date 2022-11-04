@@ -5,6 +5,7 @@ import { PageContent, BoxForm } from '../../../shared/styles';
 import { Link  } from 'react-router-dom';
 import CompaniesService from '../../../services/companies';
 import { Container, Button, Form, Alert, Row, Col, Modal } from 'react-bootstrap';
+import { validateCompany } from '../../../services/util';
 import QRCodeGenerator from '../../../services/util';
 
 class CompanyDetails extends React.Component {
@@ -74,9 +75,6 @@ class CompanyDetails extends React.Component {
     handleShowSetCompanyModal = () => {
         try {
             /* Se informou algum campo de senha, faz as validações necessárias */
-            if (!this.state.name) {
-                throw "O nome de exibição deve ser informado";
-            }
             if (this.state.newPass || this.state.confirmNewPass) {
                 if (!this.state.newPass || !this.state.confirmNewPass) {
                     throw "A nova senha deve ser informada";
@@ -91,6 +89,8 @@ class CompanyDetails extends React.Component {
                     throw "As senhas não correspondem";
                 }
             }
+            const { name, userName, newPass } = this.state;
+            validateCompany(name, userName, newPass, 'alter');            
             this.setState({ showSetCompanyModal: true });
         } catch (error) {
             this.setState({ error: error });

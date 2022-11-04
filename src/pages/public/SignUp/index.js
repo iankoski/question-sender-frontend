@@ -4,6 +4,7 @@ import { Link, withRouter } from 'react-router-dom';
 import Logo from '../../../assets/logo.png';
 import { BoxContent, BoxForm } from '../../../shared/styles';
 import CompaniesService from '../../../services/companies';
+import { validateCompany } from '../../../services/util';
 import { PageContent } from '../../../shared/styles';
 import Footer from '../../../shared/footer';
 class SignUp extends React.Component {
@@ -19,21 +20,19 @@ class SignUp extends React.Component {
 
     handleSignUp = async (event) => {
         event.preventDefault();
-        const { name, userName, password, urlQrCode, isLoading } = this.state;
-        /* Valida se todos os campos foram informados */
-        if (!name || !userName || !password) {
-            this.setState({ error: "Informe todos os campos para se cadastrar" })
-        } else {
-            try {
-                const service = new CompaniesService();
-                /* Faz o post para o backend logar */
-                await service.signup({ name, userName, password });
-                this.props.history.push("/signin");
-            } catch (error) {
-                console.log(error);
-                this.setState({ error: 'Ocorreu um erro durante a criação da conta: '+error });
-            }
+        const { name, userName, password } = this.state;
+        try {
+            /* Valida se todos os campos foram informados */
+            validateCompany(name, userName, password, 'add');           
+            const service = new CompaniesService();
+            /* Faz o post para o backend logar */
+            await service.signup({ name, userName, password });
+            this.props.history.push("/signin");
+        } catch (error) {
+            console.log(error);
+            this.setState({ error: 'Ocorreu um erro durante a criação da conta: ' + error });
         }
+
     }
 
     renderError = () => {
@@ -109,7 +108,7 @@ class SignUp extends React.Component {
                         </Col>
                     </Row>
                 </Container>
-                <Footer text="O Perguntador é uma plataforma para coleta de opinião de público através de perguntas com múltiplas escolhas. Experimente!"/>
+                <Footer text="O Perguntador é uma plataforma para coleta de opinião de público através de perguntas com múltiplas escolhas. Experimente!" />
             </PageContent>
 
         )

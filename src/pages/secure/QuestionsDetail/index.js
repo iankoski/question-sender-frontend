@@ -25,12 +25,9 @@ class QuestionDetails extends React.Component {
         }
     }
 
-    async getQuestion(questionId) {
-        const service = new QuestionsService();
-        const result = await service.getOne(questionId);
-
+    async getQuestion(question) {
         this.setState({
-            question: result,
+            question: question,
             isLoading: false
         })
         this.setState({
@@ -38,7 +35,6 @@ class QuestionDetails extends React.Component {
             startDate: this.state.question.startDate,
             endDate: this.state.question.endDate,
         })
-
     }
 
     async getAlternatives(questionId) {
@@ -101,8 +97,9 @@ class QuestionDetails extends React.Component {
     /*Ciclo de vida do React: essa função será executada sempre que o componente é montado*/
     async componentDidMount() {
         try {
+            var question = this.props.location.state;
             const { params: { questionId } } = this.props.match;
-            await this.getQuestion(questionId);
+            await this.getQuestion(question);
             await this.getAlternatives(questionId);
         } catch (error) {
             if (error.response && error.response.status === 401) {

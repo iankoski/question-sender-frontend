@@ -1,19 +1,24 @@
 import React from 'react';
 import Footer from '../../../shared/footer';
-import { PageContent, BoxForm } from '../../../shared/styles';
-import { Container, Table, Row, Col, Tab, Tabs } from 'react-bootstrap';
+import { PageContent, BoxForm, BoxContent } from '../../../shared/styles';
+import { Container, Table, Row, Col, Navbar, Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import QuestionsService from '../../../services/questions';
 import NewsService from '../../../services/news';
 import CompaniesService from '../../../services/companies';
 import { dateFormat, validateSecret, validateUid } from '../../../services/util';
 import Logo from '../../../assets/logo.png';
-
+import { Header } from '../../../shared/header/styles';
+/*
+                <Link to={{pathname: `${url}/${question.id}`,
+                           state: question}}>{question.description}</Link>
+*/
 function RenderLine({ question, companyId, deviceId, secret, companyuid }) {
     return (
         <tr key={question.id}>
             <td>
-                <Link to={`/questionsforanswer/detail/${companyId}/${question.id}/${deviceId}/companyuid/${companyuid}/secret/${secret} `}>{question.description}</Link>
+                <Link to={{pathname: `/questionsforanswer/detail/${companyId}/${question.id}/${deviceId}/companyuid/${companyuid}/secret/${secret} `,
+                          state: question}}>{question.description}</Link>
             </td>
             <td>
                 {dateFormat(question.startDate, 'dd/MM/yyyy')}
@@ -93,6 +98,7 @@ class QuestionsForAnswerList extends React.Component {
         super(props);
         this.state = {
             isLoading: true,
+            showTabQuestions: true,
             questions: [],
             text: '',
             companyName: '',
@@ -101,6 +107,19 @@ class QuestionsForAnswerList extends React.Component {
             news: []
         }
     }
+
+    handleTabQuestions = async () => {
+        this.setState({
+            showTabQuestions: true
+        });
+    }
+
+    handleTabNews = async () => {
+        this.setState({
+            showTabQuestions: false
+        });
+    }
+
 
     async getCompanyName() {
         try {
@@ -125,7 +144,7 @@ class QuestionsForAnswerList extends React.Component {
         if (!validateUid(companyId, companyuid)) {
             this.props.history.push(`/questionsforanswer/error/${companyId}`);
         }
-        
+
         this.getCompanyName();
 
         const questionsForAnswer = await questionsService.getQuestionsForAnswer(companyId, deviceId);
@@ -138,64 +157,60 @@ class QuestionsForAnswerList extends React.Component {
 
     }
 
+
+
     render() {
-        const { isLoading, questions, news } = this.state;
+        const { isLoading, questions, news, showTabQuestions } = this.state;
         const { params: { companyId, deviceId, secret, companyuid } } = this.props.match;
         return (
             <>
                 <PageContent>
+                    <BoxContent >
+                        <img src={Logo} alt='QuestionSender'  style={{ width: 100, height: 100}} />
+                    </BoxContent>
+                    <Header>
+                        <Navbar>
+                            <Container>
 
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}>
+                                <Nav>
+                                    <Nav.Link onClick={this.handleTabQuestions}>Perguntas</Nav.Link>
+                                </Nav>
+                                <Nav>
+                                    <Nav.Link onClick={this.handleTabNews}>Quadro de Notícias</Nav.Link>
+                                </Nav>
+                            </Container>
+                        </Navbar>
+                    </Header>
 
-                        <Row>
-                            <Col >
-                                <img src={Logo} alt='QuestionSender' style={{ width: 200, height: 200 }} />
-                            </Col>
-                        </Row>
-                    </div>
-                    <Tabs
-                        defaultActiveKey="questions"
-                        id="justify-tab-example"
-                        className="mb-3"
-                        justify>
-                        <Tab eventKey="questions" title="Perguntas">
-                            <Row>
-                                <Container>
-                                    <BoxForm>
-                                        <Row>
-                                            <Col>
-                                                <h3>Perguntas a serem respondidas de {isLoading ? (null) : this.state.companyName}</h3>
-                                            </Col>
-                                        </Row>
-                                        {!isLoading && <RenderTable questions={questions} companyId={companyId} deviceId={deviceId} secret={secret} companyuid={companyuid} />}
-                                    </BoxForm>
-                                </Container>
-                            </Row>
+                    {showTabQuestions
+                        ? <Row>
+                            <Container>
+                                <BoxForm>
+                                    <Row>
+                                        <Col>
+                                            <h3>Perguntas a serem respondidas de {isLoading ? (null) : this.state.companyName}</h3>
+                                        </Col>
+                                    </Row>
+                                    {!isLoading && <RenderTable questions={questions} companyId={companyId} deviceId={deviceId} secret={secret} companyuid={companyuid} />}
+                                </BoxForm>
+                            </Container>
                             <Footer text="Clique em uma pergunta para responder." />
-                        </Tab>
-
-                        <Tab eventKey="news" title="Quadro de Notícias">
-                            <Row>
-                                <Container>
-                                    <BoxForm>
-                                        <Row>
-                                            <Col>
-                                                <h3>Quadro de notícias de {!isLoading && this.state.companyName}</h3>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            {!isLoading && <RenderNews news={news} />}
-                                        </Row>
-                                    </BoxForm>
-                                </Container>
-                                <Footer text="Quadro de notícias." />
-                            </Row>
-                        </Tab>
-                    </Tabs>
+                        </Row>
+                        : <Row>
+                            <Container>
+                                <BoxForm>
+                                    <Row>
+                                        <Col>
+                                            <h3>Quadro de notícias de {!isLoading && this.state.companyName}</h3>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        {!isLoading && <RenderNews news={news} />}
+                                    </Row>
+                                </BoxForm>
+                            </Container>
+                            <Footer text="Quadro de notícias." />
+                        </Row>}
 
                 </PageContent>
             </>

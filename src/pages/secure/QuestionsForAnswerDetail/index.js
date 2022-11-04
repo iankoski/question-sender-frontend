@@ -1,7 +1,6 @@
 import React from 'react';
 import Footer from '../../../shared/footer';
 import { PageContent, BoxForm, AlternativeLetter } from '../../../shared/styles';
-import QuestionsService from '../../../services/questions';
 import AlternativesService from '../../../services/alternatives';
 import { dateFormat } from '../../../services/util';
 import { Container, Button, Form, Alert, Row, Col, Modal } from 'react-bootstrap';
@@ -27,14 +26,11 @@ class QuestionsForAnswerDetail extends React.Component {
         }
     }
 
-    async getQuestion(questionId) {
+    async getQuestion(question) {
 
         try {
-            const service = new QuestionsService();
-            const result = await service.getOne(questionId);
-
             this.setState({
-                question: result,
+                question: question,
                 isLoading: false
             })
             this.setState({
@@ -45,7 +41,6 @@ class QuestionsForAnswerDetail extends React.Component {
         } catch (error) {
             console.log(`getQuestion ${error.response.data}`);
         }
-
     }
 
     async getAlternatives(questionId) {
@@ -68,7 +63,6 @@ class QuestionsForAnswerDetail extends React.Component {
 
     handleSave = async (event) => {
         try {
-                        
             event.preventDefault();
             const { params: { companyId, questionId, deviceId } } = this.props.match;
             const alternativeId = this.state.selectedAlternative;
@@ -76,13 +70,12 @@ class QuestionsForAnswerDetail extends React.Component {
                 throw "É necessário selecionar uma alternativa";
             }            
             const answersService = new AnswersService();
-
             await answersService.sendAnswer(companyId, questionId, alternativeId, deviceId);
             /* Retorna o usuário para a tela anterior */
             this.setState({ showSentAnswerModal: true });
 
         } catch (error) {
-            console.log('handleSave: ' + error.response.data);
+            console.log('handleSave: ' + error);
             this.setState({ showSentAnswerModal: false });
             this.setState({ error });
         }
@@ -92,8 +85,9 @@ class QuestionsForAnswerDetail extends React.Component {
     /*Ciclo de vida do React: essa função será executada sempre que o componente é montado*/
     async componentDidMount() {
         try {
+            var question = this.props.location.state;
             const { params: { companyId, questionId, deviceId } } = this.props.match;
-            await this.getQuestion(questionId);
+            await this.getQuestion(question);
             await this.getAlternatives(questionId);
         } catch (error) {
             console.log('componentDidMount ' + error.response.data);

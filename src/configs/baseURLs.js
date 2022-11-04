@@ -1,6 +1,6 @@
 /* ENUM que retorna todos os endpoints */
 //const host = '192.168.0.114';
-const host = '192.168.0.114';
+const host = '192.168.0.109';
 export default {
     API_COMPANIES: `http://${host}:5001`,
     API_ALTERNATIVES: `http://${host}:5004`,

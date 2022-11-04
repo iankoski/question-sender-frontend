@@ -9,29 +9,29 @@ function dateFormat(oldDate, newFormat) {
     return format(timeInBritishsbane, newFormat);
 }
 
-function validateNews(description, startDate, endDate, title){
+function validateNews(description, startDate, endDate, title) {
     if (!description) {
         throw "Informe uma notícia válida";
     }
-    if (!title){
+    if (!title) {
         throw "Informe um título válido para a nóticia";
     }
     if (title.trim().length < 5 || !title || title.trim().length >= 60) {
         throw "Uma notícia deve ter entre 5 e 60 caracteres";
-    } 
+    }
     if (description.trim().length < 10 || !description || description.trim().length >= 2000) {
         throw "Uma notícia deve ter entre 10 e 2000 caracteres";
-    } 
-    if ((startDate.getTime() !== startDate.getTime()) 
-        || endDate.getTime() !== endDate.getTime()){
-            throw "Informe data(s) válida(s)";
-        }     
+    }
+    if ((startDate.getTime() !== startDate.getTime())
+        || endDate.getTime() !== endDate.getTime()) {
+        throw "Informe data(s) válida(s)";
+    }
     if (!description || !startDate || !endDate) {
         throw "Informe todos os campos para adicionar ou alterar a notícia";
-    }      
+    }
     if (startDate.getTime() > endDate.getTime()) {
         throw "A data que a notícia inicia deve ser menor a data que ela termina";;
-    }       
+    }
 }
 
 function validateQuestionAndAlternatives(description, startDate, endDate, alternatives, sendingStatus) {
@@ -44,16 +44,16 @@ function validateQuestionAndAlternatives(description, startDate, endDate, altern
     }
     if (!description || !startDate || !endDate) {
         throw "Informe todos os campos para adicionar ou alterar a pergunta";
-    }    
+    }
 
-    if ((startDate.getTime() !== startDate.getTime()) 
-        || endDate.getTime() !== endDate.getTime()){
-            throw "Informe data(s) válida(s)";
-        }
+    if ((startDate.getTime() !== startDate.getTime())
+        || endDate.getTime() !== endDate.getTime()) {
+        throw "Informe data(s) válida(s)";
+    }
     if (startDate.getTime() >= endDate.getTime()) {
         throw "A data que a pergunta inicia deve ser menor a data que ela termina";;
     }
-    if (alternatives.length < 2 || !alternatives ) {
+    if (alternatives.length < 2 || !alternatives) {
         throw "Informe uma alternativa válida";
     }
     if (sendingStatus === 'alter') {
@@ -75,6 +75,21 @@ function validateQuestionAndAlternatives(description, startDate, endDate, altern
     return null;
 }
 
+function validateCompany(name, userName, password, sendingStatus) {
+    if ((sendingStatus === 'add') && (!name || !userName || !password)) {
+        throw "Informe todos os campos para se cadastrar";
+    }
+    if (name.length < 3 || name.length > 150) {
+        throw "O nome da sua empresa deve ter entre 3 e 150 caracteres";
+    }
+    if (userName.length < 3) {
+        throw "O nome de usuário deve ter ao entre 3 e 150 caracteres";
+    }
+    if ((sendingStatus === 'add') && (password.length < 6 || password.length > 200)){
+        throw "A senha deve ter entre 6 e 200 caracteres";
+    }
+}
+
 function QRCodeGenerator(urlQrCode) {
 
     const [back, setBack] = useState('#FFFFFF');
@@ -84,42 +99,42 @@ function QRCodeGenerator(urlQrCode) {
     return (
         <div className="QRCodeGenerator">
 
-                {urlQrCode && (
-                    <QRCode
-                        title="QR Code que será lido pelos usuários que responderão as perguntas"
-                        value={String(urlQrCode['urlQrCode'])}
-                        bgColor={back}
-                        fgColor={fore}
-                        size={size === '' ? 0 : size}
-                    />
-                )}       
+            {urlQrCode && (
+                <QRCode
+                    title="QR Code que será lido pelos usuários que responderão as perguntas"
+                    value={String(urlQrCode['urlQrCode'])}
+                    bgColor={back}
+                    fgColor={fore}
+                    size={size === '' ? 0 : size}
+                />
+            )}
         </div>
     );
 }
 
-function validateSecret(secret){
-    try{
-        if (secret.trim() !== "82ad4f00-0d34-11ed-861d-0242ac120002"){
-            console.log('validate secret returning false '+secret.length);
+function validateSecret(secret) {
+    try {
+        if (secret.trim() !== "82ad4f00-0d34-11ed-861d-0242ac120002") {
+            console.log('validate secret returning false ' + secret.length);
             return false;
         }
         return true;
     } catch (error) {
         console.log(`validateSecret ${error}`);
     }
-    
+
 }
 
-async function validateUid(companyId, companyUid){
-    try{
+async function validateUid(companyId, companyUid) {
+    try {
         const service = new CompaniesService();
         const uid = await service.getCompanyUid(companyId);
-        if (companyUid !== uid.companyUid){
-            console.log('validateUid returning false companyId '+companyId + ' companyUid '+companyUid + ' uid.companyUid '+uid.companyUid );
+        if (companyUid !== uid.companyUid) {
+            console.log('validateUid returning false companyId ' + companyId + ' companyUid ' + companyUid + ' uid.companyUid ' + uid.companyUid);
             return false;
         }
         return true;
-    }catch(error){
+    } catch (error) {
         console.log(`validateUid ${error}`);
     }
 }
@@ -127,4 +142,4 @@ async function validateUid(companyId, companyUid){
 export default QRCodeGenerator;
 
 
-export { dateFormat, validateQuestionAndAlternatives, validateSecret, validateUid, validateNews };
+export { dateFormat, validateQuestionAndAlternatives, validateSecret, validateUid, validateNews, validateCompany };
