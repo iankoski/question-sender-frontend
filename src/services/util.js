@@ -38,7 +38,7 @@ function validateQuestionAndAlternatives(description, startDate, endDate, altern
 
     if (!description) {
         throw "Informe uma pergunta válida";
-    }
+    }    
     if (description.trim().length < 10 || !description || description.trim().length >= 150) {
         throw "Uma pergunta deve ter entre 10 e 150 caracteres";
     }

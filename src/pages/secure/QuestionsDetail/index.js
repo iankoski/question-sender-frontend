@@ -18,6 +18,9 @@ class QuestionDetails extends React.Component {
                 startDate: '',
                 endDate: ''
             },
+            description: '',
+            startDate: null,
+            endDate: null,
             showDeleteModal: false,
             showDeletedQuestionModal: false,
             showAlteredQuestionModal: false,
@@ -30,11 +33,13 @@ class QuestionDetails extends React.Component {
             question: question,
             isLoading: false
         })
+        console.log('teste 2 '+question.description);
         this.setState({
-            description: this.state.question.description,
-            startDate: this.state.question.startDate,
-            endDate: this.state.question.endDate,
+            description: question.description,
+            startDate: question.startDate,
+            endDate: question.endDate,
         })
+        console.log('teste 4 '+question.description);
     }
 
     async getAlternatives(questionId) {
